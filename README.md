@@ -24,3 +24,9 @@
 -       python -m virtualenv <any-name-of-choice>
 ##### For Linux or IOS
 -       python3 -m virtualenv <any-name-of-choice>
+
+## TODO
+  - [ ] Ajaxify the data submittion and data retrieval.
+  - [ ] Add a limit to the file size a user can upload.
+  - [ ] Create a statistical dashboard for users to see how much storage space is left to upload files and other important personal information.
+  - [ ] A progress bar to show how far a file(s) has uploaded.
