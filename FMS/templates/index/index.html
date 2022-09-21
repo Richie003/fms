@@ -1,0 +1,79 @@
+{%extends 'base.html'%}
+{%load static%}
+{%load myfilter%}
+{%block meta_tags%}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="{{request.user}}">
+    <meta name="generator" content="Jekyll v4.1.1">
+{%endblock%}
+    {%block content%}
+            <div class="my-3 p-3 bg-white rounded shadow-sm">
+                <div class="border-bottom border-gray pb-2 mb-0 d-flex align-items-center">
+                    {%if request.user%}{{user|capfirst}}{%endif%} Folders
+                    <span class="primary-bg mx-1 rounded fw-bolder" id="cart"
+                          style="border:1px solid; width: 30px; text-align:center; color:#fff;">{{folder_count}}</span>
+                </div>
+
+
+                {%for folder_name in folder_data%}
+                <div class="media text-muted pt-3">
+                    <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <div class="d-flex justify-content-between align-items-center w-100" id="append-folder">
+
+                        </div>
+                        <span class="d-block">{{folder_name.created|date:'D d M Y'}}</span>
+                    </div>
+                </div>
+                {%endfor%}
+                <!-- {%for dt in data2%}
+                <p class="text-muted"><a href="{{dt.file.url}}" class="text-decoration-none">{{dt.file}}</a></p>
+                {%endfor%} -->
+                {%if folder_data > 3%}
+                <small class="d-block text-right mt-3">
+                    <a href="#" style="color:#17a2b8;">All Files <i class="bi-files"></i></a>
+                </small>
+                {%endif%}
+            </div>
+    {%endblock%}
+{%block scripts%}
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/folder.js"></script>
+<script>
+    
+    function getCookie(name){
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== ''){
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++){
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')){
+                    cookieValue = decodeURIComponent(cookie.substring(
+                        name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function removeNotification(notificationURL, redirectURL) {
+        const csrftoken = getCookie('csrftoken');
+        let xmlhttp = new XMLHttpRequest();
+
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == XMLHttpRequest.DONE){
+                if (xmlhttp.status == 200){
+                    window.location.replace(redirectURL);
+                }else{
+                    alert('there was an error');
+                }
+            }
+        }
+        xmlhttp.open("DELETE", notificationURL, true);
+        xmlhttp.setRequestHeader("X-CSRFToken", csrftoken)
+        xmlhttp.send();
+    }
+</script>
+{%endblock%}

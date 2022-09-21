@@ -1,0 +1,448 @@
+<!doctype html>
+{%load static%}
+{%load myfilter%}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{%static 'css/base1.css' %}">
+    {%block meta_tags%}
+
+    {%endblock%}
+    <meta name="description" content="">
+    <meta name="author" content="{{request.user}}">
+    <meta name="generator" content="Jekyll v4.1.1">
+    <title>File Manager|{%block title%}{%endblock%}</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/offcanvas/">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <script>
+        var user = '{{request.user}}'
+
+        function getCookie(name){
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== ''){
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++){
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')){
+                        cookieValue = decodeURIComponent(cookie.substring(
+                            name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+
+
+    </script>
+    <!-- Custom styles for this template -->
+    <link href="{%static 'css/offcanvas.css' %}" rel="stylesheet">
+    {%block links%}
+
+    {%endblock%}
+</head>
+{%block styles%}
+{%endblock%}
+<body class="primary-bg">
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark ">
+    <a class="navbar-brand mr-auto mr-lg-2" href="/">File Manager <i class="bi-journals"></i></a>
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewBox="0 0 384 512">
+        <path d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z" fill="#fff"/>
+    </svg>
+</nav>
+
+<div class="nav-scroller bg-white shadow-sm">
+    <nav class="nav nav-underline">
+        <a class="nav-link active" href="#">My Dashboard</a>
+        <a class="nav-link" href="#share" onclick="handleClicker(this)">
+            share
+            <span class="badge badge-pill bg-light align-text-bottom">27</span>
+            <i class="bi-share"></i>
+        </a>
+        <a class="nav-link" id="filee-upload-trigger">Upload File<i class="bi-files"></i></a>
+        <a class="nav-link" onclick="folderFormTrigger(this)" style="cursor:pointer;">New Folder</a>
+        {%if request.user.is_authenticated%}
+        <a class="nav-link" href="{%url 'log_out' request.user.pk%}">LogOut <i class="bi-person-fill"></i></a>
+        {%else%}
+        <a class="nav-link" href="#signup" onclick="handleClicked(this)">Create an account?</a>
+        {%endif%}
+        <!--        <a class="nav-link" href="#">Link</a>-->
+        <!--        <a class="nav-link" href="#">Link</a>-->
+        <!--        <a class="nav-link" href="#">Link</a>-->
+    </nav>
+</div>
+
+{%for message in messages%}
+<div class="jumbotron bg-info text-center py-2 mt-3 text-white h4">
+    <span class="d-flex align-items-center justify-content-center">
+        {{message}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 384 512">
+            <path d="M288 248v28c0 6.6-5.4 12-12 12H108c-6.6 0-12-5.4-12-12v-28c0-6.6 5.4-12 12-12h168c6.6 0 12 5.4 12 12zm-12 72H108c-6.6 0-12 5.4-12 12v28c0 6.6 5.4 12 12 12h168c6.6 0 12-5.4 12-12v-28c0-6.6-5.4-12-12-12zm108-188.1V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V48C0 21.5 21.5 0 48 0h204.1C264.8 0 277 5.1 286 14.1L369.9 98c9 8.9 14.1 21.2 14.1 33.9zm-128-80V128h76.1L256 51.9zM336 464V176H232c-13.3 0-24-10.7-24-24V48H48v416h288z" fill="#fff" />
+        </svg>
+    </span>
+</div>
+{%endfor%}
+
+<main role="main" class="container py-5 mt-auto">
+    <div class="row">
+        <div class="col-md-4 order-md-2 mb-4">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+              <span class="text-white">Your Profile</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 448 512">
+                  <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" fill="#fff"/>
+            </svg>
+            </h4>
+            <ul class="list-group mb-3">
+              <li class="list-group-item d-flex justify-content-between lh-condensed">
+                <div>
+                  <h6 class="my-0">{{request.user.full_name|capfirst}}</h6>
+                  <small class="text-muted">Brief description</small>
+                </div>
+                <div style="cursor: pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 512 512" onclick="userOptions(this)">
+                        <path d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z" fill="#00e7ff"/>
+                    </svg>
+                    <div class="primary-bg px-3 py-2 d-none" id="option-dropdown" style="position: absolute; transform: translate3d(-29px, 36px, 0px); top: 0px; right: 0px; will-change: transform; z-index: 3; border-radius: 43px 1px 24px 25px;">
+                        <div class="dropdown-header text-white" style="cursor: text">Options For You:</div>
+                        <a class="dropdown-item d-flex justify-content-between align-items-center text-dark" href="#">Share 
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" style="margin-left: 8px;" viewBox="0 0 448 512">
+                            <path d="M352 320c-22.608 0-43.387 7.819-59.79 20.895l-102.486-64.054a96.551 96.551 0 0 0 0-41.683l102.486-64.054C308.613 184.181 329.392 192 352 192c53.019 0 96-42.981 96-96S405.019 0 352 0s-96 42.981-96 96c0 7.158.79 14.13 2.276 20.841L155.79 180.895C139.387 167.819 118.608 160 96 160c-53.019 0-96 42.981-96 96s42.981 96 96 96c22.608 0 43.387-7.819 59.79-20.895l102.486 64.054A96.301 96.301 0 0 0 256 416c0 53.019 42.981 96 96 96s96-42.981 96-96-42.981-96-96-96z"/>
+                        </svg>
+                    </a>
+                        <a class="dropdown-item d-flex justify-content-between align-items-center text-dark" href="#">
+                            link <svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" style="margin-left: 8px;" viewBox="0 0 512 512">
+                                <path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/>
+                            </svg></a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item d-flex justify-content-between align-items-center text-dark" href="#">Settings
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" style="margin-left: 8px;" viewBox="0 0 640 512">
+                                <path d="M512.1 191l-8.2 14.3c-3 5.3-9.4 7.5-15.1 5.4-11.8-4.4-22.6-10.7-32.1-18.6-4.6-3.8-5.8-10.5-2.8-15.7l8.2-14.3c-6.9-8-12.3-17.3-15.9-27.4h-16.5c-6 0-11.2-4.3-12.2-10.3-2-12-2.1-24.6 0-37.1 1-6 6.2-10.4 12.2-10.4h16.5c3.6-10.1 9-19.4 15.9-27.4l-8.2-14.3c-3-5.2-1.9-11.9 2.8-15.7 9.5-7.9 20.4-14.2 32.1-18.6 5.7-2.1 12.1.1 15.1 5.4l8.2 14.3c10.5-1.9 21.2-1.9 31.7 0L552 6.3c3-5.3 9.4-7.5 15.1-5.4 11.8 4.4 22.6 10.7 32.1 18.6 4.6 3.8 5.8 10.5 2.8 15.7l-8.2 14.3c6.9 8 12.3 17.3 15.9 27.4h16.5c6 0 11.2 4.3 12.2 10.3 2 12 2.1 24.6 0 37.1-1 6-6.2 10.4-12.2 10.4h-16.5c-3.6 10.1-9 19.4-15.9 27.4l8.2 14.3c3 5.2 1.9 11.9-2.8 15.7-9.5 7.9-20.4 14.2-32.1 18.6-5.7 2.1-12.1-.1-15.1-5.4l-8.2-14.3c-10.4 1.9-21.2 1.9-31.7 0zm-10.5-58.8c38.5 29.6 82.4-14.3 52.8-52.8-38.5-29.7-82.4 14.3-52.8 52.8zM386.3 286.1l33.7 16.8c10.1 5.8 14.5 18.1 10.5 29.1-8.9 24.2-26.4 46.4-42.6 65.8-7.4 8.9-20.2 11.1-30.3 5.3l-29.1-16.8c-16 13.7-34.6 24.6-54.9 31.7v33.6c0 11.6-8.3 21.6-19.7 23.6-24.6 4.2-50.4 4.4-75.9 0-11.5-2-20-11.9-20-23.6V418c-20.3-7.2-38.9-18-54.9-31.7L74 403c-10 5.8-22.9 3.6-30.3-5.3-16.2-19.4-33.3-41.6-42.2-65.7-4-10.9.4-23.2 10.5-29.1l33.3-16.8c-3.9-20.9-3.9-42.4 0-63.4L12 205.8c-10.1-5.8-14.6-18.1-10.5-29 8.9-24.2 26-46.4 42.2-65.8 7.4-8.9 20.2-11.1 30.3-5.3l29.1 16.8c16-13.7 34.6-24.6 54.9-31.7V57.1c0-11.5 8.2-21.5 19.6-23.5 24.6-4.2 50.5-4.4 76-.1 11.5 2 20 11.9 20 23.6v33.6c20.3 7.2 38.9 18 54.9 31.7l29.1-16.8c10-5.8 22.9-3.6 30.3 5.3 16.2 19.4 33.2 41.6 42.1 65.8 4 10.9.1 23.2-10 29.1l-33.7 16.8c3.9 21 3.9 42.5 0 63.5zm-117.6 21.1c59.2-77-28.7-164.9-105.7-105.7-59.2 77 28.7 164.9 105.7 105.7zm243.4 182.7l-8.2 14.3c-3 5.3-9.4 7.5-15.1 5.4-11.8-4.4-22.6-10.7-32.1-18.6-4.6-3.8-5.8-10.5-2.8-15.7l8.2-14.3c-6.9-8-12.3-17.3-15.9-27.4h-16.5c-6 0-11.2-4.3-12.2-10.3-2-12-2.1-24.6 0-37.1 1-6 6.2-10.4 12.2-10.4h16.5c3.6-10.1 9-19.4 15.9-27.4l-8.2-14.3c-3-5.2-1.9-11.9 2.8-15.7 9.5-7.9 20.4-14.2 32.1-18.6 5.7-2.1 12.1.1 15.1 5.4l8.2 14.3c10.5-1.9 21.2-1.9 31.7 0l8.2-14.3c3-5.3 9.4-7.5 15.1-5.4 11.8 4.4 22.6 10.7 32.1 18.6 4.6 3.8 5.8 10.5 2.8 15.7l-8.2 14.3c6.9 8 12.3 17.3 15.9 27.4h16.5c6 0 11.2 4.3 12.2 10.3 2 12 2.1 24.6 0 37.1-1 6-6.2 10.4-12.2 10.4h-16.5c-3.6 10.1-9 19.4-15.9 27.4l8.2 14.3c3 5.2 1.9 11.9-2.8 15.7-9.5 7.9-20.4 14.2-32.1 18.6-5.7 2.1-12.1-.1-15.1-5.4l-8.2-14.3c-10.4 1.9-21.2 1.9-31.7 0zM501.6 431c38.5 29.6 82.4-14.3 52.8-52.8-38.5-29.6-82.4 14.3-52.8 52.8z"/>
+                            </svg>
+                        </a>
+                      </div>
+                </div>
+              </li>
+              <li class="list-group-item d-flex justify-content-between lh-condensed" style="flex-direction: column;">
+                <div class="h-100 w-100">
+                    {%bio%}
+                </div>
+                <div class="d-flex align-items-center justify-content-end">
+                    <a href="" class="bg-dark rounded px-2 py-1">
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="14" height="20" viewBox="0 0 448 512">
+                            <path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z" fill="#fff"/>
+                        </svg>
+                    </a>
+                    <a href="" class="bg-dark rounded px-2 py-1 ml-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 192 512">
+                            <path d="M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.235 0 24 32.235 24 72s32.235 72 72 72 72-32.235 72-72S135.764 0 96 0z" fill="#fff" />
+                        </svg>
+                    </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        <div class="col-md-8 order-md-1">
+            <div class="p-3 my-3 text-white bg-dark rounded shadow-sm">
+                C:{{request.path}}
+                <!-- <form class="form-inline my-2 my-lg-0" action="" method="GET">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Find your Files" aria-label="Search" id="code">
+                    <button class="but btn btn-dark my-2 my-sm-0 generate" type="button" id="generate">
+                        <svg width="19" height="25" viewBox="0 0 297 297" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="search-svgrepo-com 1">
+                                <g id="Group">
+                                    <g id="Group_2">
+                                        <path id="Vector"
+                                              d="M206.508 167.062C164.287 167.062 129.938 132.713 129.938 90.4922C129.938 48.2712 164.287 13.9219 206.508 13.9219C248.729 13.9219 283.078 48.2712 283.078 90.4922C283.078 132.713 248.729 167.062 206.508 167.062Z"
+                                              fill="#BBF1FB"/>
+                                    </g>
+                                    <g id="Group_3">
+                                        <path id="Vector_2"
+                                              d="M139.217 146.179L120.655 164.742L132.256 176.343L150.818 157.781L139.217 146.179Z"
+                                              fill="#8A8895"/>
+                                    </g>
+                                    <g id="Group_4">
+                                        <path id="Vector_3"
+                                              d="M134.569 176.759C132.829 172.898 129.797 169.641 128.582 168.425C126.385 166.224 120.629 161.108 114.656 161.108C112.109 161.108 109.838 162.033 108.012 163.866L4.07853 273.232C1.4502 275.864 0 279.36 0 283.078C0 286.796 1.4502 290.293 4.07853 292.921C6.70744 295.552 10.2059 297 13.9219 297C17.6379 297 21.1369 295.552 23.6788 293.005L133.218 188.908C134.977 187.152 137.488 183.237 134.569 176.759Z"
+                                              fill="#7E5C62" fill-opacity="0.66"/>
+                                    </g>
+                                    <g id="Group_5">
+                                        <path id="Vector_4"
+                                              d="M206.508 0C156.612 0 116.016 40.5939 116.016 90.4922C116.016 140.391 156.612 180.984 206.508 180.984C256.404 180.984 297 140.391 297 90.4922C297 40.5939 256.404 0 206.508 0ZM206.508 167.062C164.287 167.062 129.938 132.713 129.938 90.4922C129.938 48.2712 164.287 13.9219 206.508 13.9219C248.729 13.9219 283.078 48.2712 283.078 90.4922C283.078 132.713 248.729 167.062 206.508 167.062Z"
+                                              fill="#5C546A"/>
+                                    </g>
+                                    <g id="Group_6">
+                                        <path id="Vector_5"
+                                              d="M134.569 176.759C132.829 172.898 129.797 169.641 128.582 168.425L128.579 168.421L4.07855 292.921C6.70747 295.552 10.2059 297 13.9219 297C17.6379 297 21.1369 295.552 23.6788 293.005L133.218 188.908C134.977 187.152 137.488 183.237 134.569 176.759Z"
+                                              fill="#9E6459"/>
+                                    </g>
+                                    <g id="Group_7">
+                                        <path id="Vector_6"
+                                              d="M95.8503 176.663L120.337 201.15L127.067 194.754L102.246 169.933L95.8503 176.663Z"
+                                              fill="#5C546A"/>
+                                    </g>
+                                    <g id="Group_8">
+                                        <path id="reflection"
+                                              d="M225.07 99.7734C209.717 99.7734 197.227 87.2826 197.227 71.9297C197.227 56.5768 209.717 44.0859 225.07 44.0859C240.423 44.0859 252.914 56.5768 252.914 71.9297C252.914 87.2826 240.423 99.7734 225.07 99.7734Z"
+                                              fill="white"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                    </button>
+                </form> -->
+            </div>
+        
+            {%block content%}
+
+            {%endblock%}
+        </div>
+    </div>
+</main>
+<footer class="px-5 mt-5 py-5 bg-light">
+    <div class="row">
+        <div class="col-12 col-md">
+            <small class="d-block mb-3 text-muted">&copy; Startall... 2017-2020</small>
+        </div>
+        <div class="col-6 col-md">
+            <h5>Features</h5>
+            <ul class="list-unstyled text-small">
+                <li><a href="#donate" id="button" class="button text-muted" onclick="handleClick(this)">Donate</a></li>
+                <li><a class="text-muted" href="#">Latest feature</a></li>
+                <li><a class="text-muted" href="#">Update info</a></li>
+                <li><a class="text-muted" href="#">Developers</a></li>
+            </ul>
+        </div>
+        <div class="col-6 col-md">
+            <h5>Resources</h5>
+            <ul class="list-unstyled text-small">
+                <li><a class="text-muted" href="#">Api</a></li>
+            </ul>
+        </div>
+        <div class="col-6 col-md">
+            <h5>About</h5>
+            <ul class="list-unstyled text-small">
+                <li><a class="text-muted" href="#">Team</a></li>
+                <li><a class="text-muted" href="#">Locations</a></li>
+                <li><a class="text-muted" href="#">Privacy</a></li>
+                <li><a class="text-muted" href="javascript.void()">Terms</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+<div class="bg-modal rounded py-3 px-3 position-fixed" id="image">
+    <div class="modal-content py-2 px-3">
+        <div class="close" onclick="cancelClick(this)">+</div>
+        <i class="bi-person-circle" style="font-size:300%; color:#757577;"></i>
+        <form action="" class="py-2 px-3" method="POST" enctype="multipart/form-data" id="add-file">
+            {%csrf_token%}
+            <input type="hidden" name="file-add">
+            <div class="form-floating mb-3" style="display:none;">{{form.user}}</div>
+            <div class="form-floating mb-3">{{form.file}}</div>
+            <div class="form-floating mb-3" style="display:none;">{{form.associate_folder}}</div>
+            {%csrf_token%}
+            <button class="form-control btn btn-dark mt-3" type="submit">Upload</button>
+        </form>
+    </div>
+</div>
+<div class="bg-modal4 rounded py-3 px-3 position-fixed" id="folder_creation">
+    <div class="modal-content py-2 px-3">
+        <div class="close" onclick="folderFormCancel(this)">+</div>
+        <i class="bi-file" style="font-size:300%; color:#757577;"></i>
+        <form action="" class="py-2 px-3" method="POST" enctype="multipart/form-data" id="add-file">
+            <input type="hidden" name="folder-add">
+            {{form2.folder}}
+            {%csrf_token%}
+            <button class="form-control btn btn-dark mt-3" type="submit">Upload</button>
+        </form>
+    </div>
+</div>
+<div class="bg-modal2 rounded py-3 px-3 position-fixed" id="share">
+    <div class="modal-content py-2 px-3">
+        <div class="close" onclick="cancelClicker(this)">+</div>
+        <i class="bi-share" style="font-size:210%; color:#757577;"></i>
+        <div class="mt-5 d-flex justify-content-around align-items-center">
+            <div class="d-flex justify-content-around align-items-center" style="flex-direction:column;">
+                <a href="https://{{request.build_absolute_uri}}" class="socials text-decoration-none"><i
+                        class="bi-envelope"></i></a>
+                <p class="text-muted">email</p>
+            </div>
+            <div class="d-flex justify-content-around align-items-center" style="flex-direction:column;">
+                <a href="https://{{request.build_absolute_uri}}" class="socials text-decoration-none"><i
+                        class="bi-facebook"></i></a>
+                <p class="text-muted">Facebook</p>
+            </div>
+            <div class="d-flex justify-content-around align-items-center" style="flex-direction:column;">
+                <a href="https://{{request.build_absolute_uri}}" class="socials text-decoration-none"><i
+                        class="bi-github"></i></a>
+                <p class="text-muted">Github</p>
+            </div>
+            <div class="d-flex justify-content-around align-items-center" style="flex-direction:column;">
+                <a href="https://{{request.build_absolute_uri}}" class="socials text-decoration-none"><i
+                        class="bi-discord"></i></a>
+                <p class="text-muted">Discord</p>
+            </div>
+            <div class="d-flex justify-content-around align-items-center" style="flex-direction:column;">
+                <a href="" class="socials text-decoration-none"><i class="bi-link"></i></a>
+                <p class="text-muted">link</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="bg-modal3 rounded py-2 px-3 position-fixed" id="signup">
+    <div class="modal-content py-5 px-5 mt-5 h-100">
+        <div class="close" onclick="cancelClicked(this)">+</div>
+        <i class="bi-person-circle" style="font-size:300%; color:#757577;"></i>
+        <form action="" class="py-2 px-3" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="user_create">
+            <div class="form-floating mb-1">
+                <label for="id_full_name">Fullname</label>
+                {{form1.full_name}}
+            </div>
+            <div class="form-floating mb-1">
+                <label for="id_email">Email</label>
+                {{form1.email}}
+            </div>
+            <div class="form-floating mb-1">
+                <label for="id_username">Username</label>
+                {{form1.username}}
+            </div>
+            <div class="form-floating mb-1">
+                <label for="id_phone_number">Tel</label>
+                {{form1.tel}}
+            </div>
+            <div class="form-floating mb-1">
+                <label for="id_password1">Password</label>
+                {{form1.password1}}
+            </div>
+            <div class="form-floating mb-1">
+                <label for="id_password2">Confirm Password</label>
+                {{form1.password2}}
+            </div>
+            {%csrf_token%}
+            <button class="form-control btn btn-dark mt-3 mb-3" type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+<script src="{%static 'js/transcop.js'%}"></script>
+<script src="{%static 'js/jquery.js'%}"></script>
+<script src="{%static 'js/bootstrap.bundle.min.js'%}"></script>
+<script>
+    function handleClick(element){
+        document.querySelector(".bg-modal").style="display:flex!important;";
+    }
+    function cancelClick(element){
+        document.querySelector(".bg-modal").style="display:none!important;"
+        // const addFileForm = document.getElementById('add-file')
+    }
+
+    function handleClicker(element){
+        document.querySelector(".bg-modal2").style="display:flex!important;";
+    }
+    function cancelClicker(element){
+        document.querySelector(".bg-modal2").style="display:none!important;"
+    }
+    function handleClicked(element){
+        document.querySelector(".bg-modal3").style="display:flex!important;";
+    }
+    function cancelClicked(element){
+        document.querySelector(".bg-modal3").style="display:none!important;"
+    }
+
+    function folderFormTrigger(element) {
+        document.querySelector(".bg-modal4").style="display:flex!important;";
+    }
+
+    function folderFormCancel(element) {
+        document.querySelector(".bg-modal4").style="display:none!important;";
+    }
+
+    function userOptions(element) {
+        var userOptionvar = document.getElementById('option-dropdown')
+
+        if (userOptionvar.classList.contains('d-none')){
+            userOptionvar.classList.remove('d-none')
+        }else{
+            userOptionvar.classList.add('d-none')
+        }
+    }
+// <!--    for the code generator-->
+    var code = document.getElementById('code')
+    var view = document.getElementById('cart')
+    var newFile = document.getElementById('new_file')
+    var generator = document.getElementsByClassName('generate')
+
+    function loadpage(time) {
+	    setTimeout("location.reload(true);", time);
+    };
+
+// <!--    for (var i = 0; i < generator.length; i++){-->
+// <!--        generator[i].addEventListener('click', () => {-->
+// <!--            view.innerHTML = i++-->
+// <!--            code.value = '{{randomm}}';-->
+// <!--            console.log('{{randomm}}')-->
+// <!--        })-->
+// <!--    }-->
+
+
+
+
+
+</script>
+<script>
+            var buTs = document.getElementsByClassName('buttss')
+            var newFile = document.getElementsByClassName('app_id')
+            var FileName = document.getElementById('id_associate_folder')
+                for (var i = 0; i < buTs.length; i++){
+                    buTs[i].addEventListener('click', function(){
+                        var butId = this.dataset.val
+                        FileName.value = butId
+                        console.log(butId)
+                    })
+            };
+</script>
+<script>
+    						/* Because i didnt set placeholder values in forms.py they will be set here using vanilla Javascript
+		//We start indexing at one because CSRF_token is considered an input field
+		 */
+
+		//Query All input fields
+		var form_fields = document.getElementsByTagName('input')
+        var addPlaceholder = document.getElementById('id_folder').placeholder = 'Folder Name';
+
+		var select_fields = document.getElementsByTagName('select')
+
+
+		for (var field in form_fields){
+			form_fields[field].className += ' form-control'
+		}
+		for (var field in select_fields){
+			select_fields[field].className += ' form-control'
+		}
+
+
+
+
+
+
+
+
+
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script>
+<script src="{%static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{%static 'js/offcanvas.js' %}"></script>
+{%block scripts%}
+{%endblock%}
+</body>
+</html>
