@@ -164,11 +164,4 @@ STATIC_ROOT = os.path.join(BASE_DIR / 'collected_static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # SESSIONS
-#
-# SESSION_CACHE_ALIAS = 'Ip_Address'
-# SESSION_COOKIE_HTTPONLY = True
-# SESSION_COOKIE_SECURE = True
-# # COOKIES
-# CSRF_COOKIE_SECURE = True
-# CSRF_COOKIE_HTTPONLY = True
 
