@@ -19,13 +19,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY=''
+SECRET_KEY='django-insecure-6suvy)xm+d!jtwv&z%38+83!5z3c3s+*9e$e&gzzs+h@@a99&='
 # Initial secret key not displayed for security reasons.
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -135,6 +135,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOGIN_REDIRECT_URL = "home"
+LOGIN_URL = "login"
+
 # for files sizes
 CONTENT_TYPES = ['image', 'video', 'pdf', 'doc']
 # 2.5MB - 2621440
@@ -164,5 +167,10 @@ STATIC_ROOT = os.path.join(BASE_DIR / 'collected_static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# SESSIONS
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = None
+EMAIL_PORT = None
+EMAIL_HOST_USER = None
+EMAIL_HOST_PASSWORD = None
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True

@@ -1,8 +1,8 @@
-asgiref==3.5.2
-colorama==0.4.5
+asgiref
+colorama
 Django==3.2.7
-pybind11==2.10.0
-pytz==2022.2.1
-qrcode==6.1
-six==1.16.0
-sqlparse==0.4.2
+pybind11
+pytz
+qrcode
+six
+sqlparse
