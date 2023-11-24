@@ -1,6 +1,7 @@
 asgiref
 colorama
 Django==3.2.7
+# pillow
 pybind11
 pytz
 qrcode

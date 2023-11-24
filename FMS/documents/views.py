@@ -34,6 +34,16 @@ from django.contrib import messages
 @login_required
 @csrf_protect
 def index(request):
+    """
+    The `index` function is a view function in a Django web application that handles requests to the
+    homepage, performs various operations such as creating users, adding files and folders, and renders
+    the homepage template with the necessary data.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    user. It contains information about the request, such as the user making the request, the method
+    used (GET or POST), any data sent with the request, and other metadata
+    :return: a rendered HTML template called "index/index.html" with the context variables passed to it.
+    """
     user = request.user
     symbols = ["!", "@", "_", "*", "&", "%", "$", "#", "-", "(", ")"]
     nums = random.randint(100, 300)

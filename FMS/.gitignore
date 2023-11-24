@@ -4,9 +4,6 @@ db.sqlite3
 # Migration files
 migrations/
 
-# Static files
-static/
-
 # Media files
 mediafiles/
 
