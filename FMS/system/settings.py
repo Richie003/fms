@@ -37,9 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     # 'livesync',
     'django.contrib.staticfiles',
-    # 'qr_code',
-    'documents.apps.DocumentsConfig',
+    # 'qr_code',#
     'accounts.apps.AccountsConfig',
+    'documents.apps.DocumentsConfig',
 ]
 
 # DJANGO_LIVESYNC = {
@@ -82,6 +82,7 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = 'accounts.User'
 WSGI_APPLICATION = 'system.wsgi.application'
 
 # Database
@@ -123,7 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-AUTH_USER_MODEL = 'accounts.User'
 
 LANGUAGE_CODE = 'en-us'
 

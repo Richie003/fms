@@ -13,8 +13,6 @@
         <div class="border-bottom border-gray pb-2 mb-0 d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 {{author|capfirst}} File(s)
-                <span class="primary-bg mx-1 rounded fw-bold" id="cart"
-                    style="border:1px solid; width: 30px; text-align:center; color:#fff;">{{file_count}}</span>
             </div>
         <div>
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" class="" viewBox="0 0 512 512">
@@ -65,11 +63,11 @@
         <p class="text-muted"><a href="{{dt.file.url}}" class="text-decoration-none">{{dt.file}}</a></p>
         {%endfor%} -->
         <small class="d-block text-right mt-3">
-            <a href="#" style="color:#17a2b8;">All Files <i class="bi-files"></i></a>
+            <a href="#" style="color:#17a2b8;">All Files <i class="bi bi-layers"></i></a>
         </small>
     </div>
     {%endblock%}
 {%block scripts%}
-<script src="{% static 'js/files_functs.js' %}"></script>
+<script src="{% static 'js/file_func.js' %}"></script>
 {%endblock%}
 

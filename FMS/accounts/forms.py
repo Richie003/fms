@@ -55,11 +55,6 @@ class UserAdminCreationForm(forms.ModelForm):
             raise forms.ValidationError("Passwords don't match")
         return password2
 
-    # def clean_reg(self):
-    #     num = self.cleaned_data.get('reg_no')
-    #     if '/' not in num:
-    #         raise forms.ValidationError('not a password')
-    #     return num
 
     def save(self, commit=True):
         # Save the provided password in hashed format

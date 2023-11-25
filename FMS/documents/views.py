@@ -13,7 +13,7 @@ from accounts.forms import UserAdminCreationForm
 from django.views.decorators.csrf import csrf_protect
 from accounts.models import UserBio
 from urllib.parse import quote_plus
-from .models import FileData, Folder, Share
+from .models import FileData, Folder, Share, Notification
 from .forms import FileDataForm, FolderDataForm
 import secrets
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -171,7 +171,7 @@ def generate_share_url(request):
             # Retrieve the existing access link
             existing_share = Share.objects.get(file_id=id, access_link__isnull=False)
             uidb64 = urlsafe_base64_encode(force_bytes(FILE.id))
-            access_url = f"http://localhost:8001/surl/{existing_share.access_link}/{uidb64}"
+            access_url = f"http://localhost:8000/surl/{existing_share.access_link}/{uidb64}"
             return JsonResponse({"res": access_url}, safe=False)
         elif not share_exists:
             # Create a new access link if it doesn't exist
@@ -183,25 +183,25 @@ def generate_share_url(request):
                 access_link=access_link,
             )
             uidb64 = urlsafe_base64_encode(force_bytes(FILE.id))
-            access_url = f"http://localhost:8001/surl/{access_link}/{uidb64}"
+            access_url = f"http://localhost:8000/surl/{access_link}/{uidb64}"
             return JsonResponse({"res": access_url}, safe=False)
-
 
 
 @login_required
 def validate_share_url(request, access_link, uidb64):
     """
-    The function `validate_share_url` checks if a user has access to a file based on a share URL and
-    redirects them to the file if they have access, otherwise it returns an error message.
+    The function `validate_share_url` checks if a user has access to a shared file and redirects them to
+    the file if they do, otherwise it sends an email and a notification to the file owner and returns an error
+    message.
     
-    :param request: The `request` parameter is an object that represents the HTTP request made by the
-    client. It contains information such as the request method, headers, and user session
+    :param request: The request object represents the HTTP request made by the user
     :param access_link: The access_link parameter is a unique identifier for a specific share. It is
     used to retrieve the Share object from the database
     :param uidb64: The `uidb64` parameter is a URL-safe base64 encoded string that represents the user's
     ID. It is used to encode and decode the user's ID when generating and validating share URLs
-    :return: either a redirect to a specific URL or an HttpResponse with the message 'You do not have
-    access to this file'. If an exception occurs, it will return the reverse of the 'index' URL.
+    :return: The code is returning either a redirect to a specific URL or an HttpResponse with the
+    message 'You do not have access to this file'. If an exception occurs, it will return the reverse of
+    the 'index' URL.
     """
     try:
         query_share_model = Share.objects.get(access_link=access_link)
@@ -213,14 +213,29 @@ def validate_share_url(request, access_link, uidb64):
         else:
             new_uidb64 = urlsafe_base64_encode(force_bytes(request.user.id))
             data = {
-                "link": f"http://localhost:8001/authorize/{access_link}/{new_uidb64}/"
+                "link": f"http://localhost:8000/authorize/{access_link}/{new_uidb64}/"
             }
+            message = f"""{request.user} is trying to gain access to your file"""
+            Notification.objects.create(to_user_id=int(query_share_model.sharer_id), message=message)
             sendEmail(request, data["link"])
             return HttpResponse('You do not have access to this file')
     except Exception as e:
         return reverse(index)
 
+
 def grant_access_via_email(request, access_link, ID):
+    """
+    The function grants access to a user via email by adding their ID to the sharee list of a Share
+    object.
+    
+    :param request: The `request` parameter is an HTTP request object that contains information about
+    the current request being made by the user
+    :param access_link: The access link is a unique identifier that is used to grant access to a
+    specific resource or functionality. It could be a URL or a token that is generated when a user
+    requests access
+    :param ID: The ID parameter is a URL-safe base64 encoded string that represents the user ID
+    :return: a redirect to the root URL ("/").
+    """
     decode_user_id = force_str(urlsafe_base64_decode(ID))
     query_share_model = Share.objects.get(access_link=access_link)
     query_share_model.sharee.add(int(decode_user_id))

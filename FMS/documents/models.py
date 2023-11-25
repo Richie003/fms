@@ -4,6 +4,21 @@ from django.core.files import File
 from io import BytesIO
 from django.utils.timezone import now
 
+# The `Notification` class represents a notification message with a recipient, message content, read
+# status, and timestamp.
+class Notification(models.Model):
+    to_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
+    message = models.TextField(default="", max_length=225)
+    read_receipt = models.BooleanField(default=False)
+    read = models.DateTimeField(default=now)
+    
+    class Meta:
+        ordering = ['-read']
+        
+    def __str__(self):
+        return str(self.message)
+    
+
 
 class FileData(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -48,7 +63,7 @@ class FileData(models.Model):
 
 class Folder(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
-    folder = models.CharField(default='', blank=False, max_length=45)
+    folder = models.CharField(default='', blank=False, max_length=45, unique=True)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now_add=True)
 
@@ -58,10 +73,27 @@ class Folder(models.Model):
     class Meta:
         ordering = ['-created']
 
+class SubFolder(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    parent_folder = models.ForeignKey(Folder, null=True, blank=True, on_delete=models.SET_NULL)
+    folder = models.CharField(default='', blank=False, max_length=45)
+    created = models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return str('%s%s%s' % (self.user, '-', self.folder))
+    
+    class Meta:
+        ordering = ['-created']
+        constraints = [
+                models.UniqueConstraint(fields=['parent_folder',], name='unique_folder_for_user')
+            ]
+
+# The Share class represents a sharing relationship between users, files, and folders in a system,
+# with an access link and creation timestamp.
 class Share(models.Model):
     sharer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="sharer", on_delete=models.SET_NULL)
-    sharee = models.ManyToManyField(settings.AUTH_USER_MODEL, null=True, blank=True,)
+    sharee = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,)
     file = models.ForeignKey(FileData, null=True, blank=True, on_delete=models.CASCADE)
     folder = models.ForeignKey(Folder, null=True, blank=True, on_delete=models.CASCADE)
     access_link = models.CharField(max_length=255, unique=True)

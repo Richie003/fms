@@ -55,18 +55,31 @@
       .navbar{
         justify-content:center !important;
       }
+      .notify{
+        animation: 1s ring infinite;
+      }
+      @keyframes ring{
+        25%{
+          transform: rotateZ(13deg);
+          }
+        50%{
+          transform: rotateZ(-13deg);
+          }
+        100%{
+          transform: rotateZ(0deg);
+        }
+      }     
     </style>
   {%endblock%}
   <body class="primary-bg">
     <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
-      <div>
-        <a class="navbar-brand mr-auto mr-lg-2" href="/">File Manager</a>
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewBox="0 0 384 512" >
-            <path
-              d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z"
-              fill="#fff"
-            />
-        </svg>
+      <div class="w-100" style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <a class="navbar-brand mr-auto mr-lg-2" href="/">File Manager</a>
+        </div>
+        <div {% if request.user.count_notification > 0 %}class="notify"{%endif%}>
+          <i {% if request.user.count_notification > 0 %}class="bi bi-bell-fill"{%else%}class="bi bi-bell"{%endif%} style="font-size: 120%; color: #fff"></i>
+        </div>
       </div>
     </nav>
 
@@ -346,6 +359,7 @@
           <h5>Resources</h5>
           <ul class="list-unstyled text-small">
             <li><a class="text-muted" href="#">Api</a></li>
+            <li><a class="text-muted" href="#">{{request.user.count_notification}}</a></li>
           </ul>
         </div>
         <div class="col-6 col-md">

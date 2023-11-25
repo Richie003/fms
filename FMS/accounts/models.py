@@ -13,6 +13,7 @@ import qrcode
 from io import BytesIO
 from PIL import Image, ImageDraw
 from django.core.files import File
+from documents.models import Notification
 
 
 class UserManager(BaseUserManager):
@@ -77,14 +78,6 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    # COLLEGES = (
-    #     ('SCIENCES', 'SCIENCES'),
-    #     ('HEALTH SCIENCES', 'HEALTH SCIENCES'),
-    #     ('SOCIAL SCIENCES', 'SOCIAL SCIENCES'),
-    #     ('MANAGEMENT SCIENCES', 'MANAGEMENT SCIENCES'),
-    #     ('ART', 'ART')
-    # )
-    # college = models.CharField(max_length=30, default='', choices=COLLEGES)
     username = models.CharField(default='', verbose_name='username', unique=True, null=False, blank=False,
                                 max_length=30)
     tel = models.CharField(default='', null=True, blank=True, max_length=11)
@@ -145,6 +138,17 @@ class User(AbstractBaseUser):
     def is_active(self):
         """Is the user active?"""
         return self.active
+    
+    @property
+    def get_user_notifications(self):
+        query_notification_model = Notification.objects.filter(to_user_id=self.pk, read_receipt=False)
+        return query_notification_model
+    
+    @property
+    def count_notification(self):
+        query_notification_model = Notification.objects.filter(to_user_id=self.pk, read_receipt=False).count()
+        return query_notification_model
+        
 
 
 class UserBio(models.Model):
