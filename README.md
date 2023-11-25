@@ -2,14 +2,14 @@
 ***A file management system web application that allows users to create folders and store/upload files*** _(all file types like; images, audios, videos etc)_. Have a view of the project here [Launch](https://fms.pythonanywhere.com)
 
 
-### What's Special ?
-- A user gets a unique QRcode when they sign_up which can be used to refer other users to their profile.
+### What's Special?
+- A user gets a unique QRcode when they sign up which can be used to refer other users to their profile.
 
 ### Usage
 - Fork the repo and run ```git commit -m url``` in your local terminal or shell.
 > Ensure you have python3.8 not <~~3.8~~ installed and added to path.
 - Install virtual environment library.
-- Create a virtual environment to contain the project dependecies.
+- Create a virtual environment to contain the project dependencies.
 - Activate the virtual environment and install the dependencies in the requirements.py file.
 
 
@@ -19,14 +19,17 @@
 ##### For Linux or IOS
 -       pip3 install virtualenv
 
-### Create Virtual environment
+### Create a Virtual environment
 ##### For Windows
 -       python -m virtualenv <any-name-of-choice>
 ##### For Linux or IOS
 -       python3 -m virtualenv <any-name-of-choice>
 
 ## TODO
-  - [ ] Ajaxify the data submittion and data retrieval.
-  - [ ] Add a limit to the file size a user can upload.
-  - [ ] Create a statistical dashboard for users to see how much storage space is left to upload files and other important personal information.
-  - [ ] A progress bar to show how far a file(s) has uploaded.
+  - [ ] Add user notification system.
+  - [ ] create an algorithm and model for folders & sub-folders.
+  - [ ] Search functionality.
+  - [ ] Integrate Dropbox with the system to upload multiple files.
+  - [ ] Integrate WhatsApp Api with the system to upload files from WhatsApp to the web app/download files from the web app.
+  - [ ] Create a dashboard for users to see metrics on how much storage space is left to upload files and other important personal information.
+  - [ ] A progress bar showing how far a file(s) has been uploaded.
