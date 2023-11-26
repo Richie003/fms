@@ -25,7 +25,7 @@ def truncate(value):
 @register.filter(autoescape=True, is_safe=True)
 @stringfilter
 def get_objects(value):
-    query = FileData.objects.filter(associate_folder=value)
+    query = FileTable.objects.filter(associate_folder=value)
     # if value:
     #     new = query.filter(
     #         Q(associate_folder__icontains=value)

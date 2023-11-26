@@ -10,7 +10,6 @@ class FileDataForm(forms.ModelForm):
         model = FileData
         fields = (
             'file',
-            'associate_folder'
         )
     # def clean_content(self):
     #     content = self.cleaned_data.get('file')

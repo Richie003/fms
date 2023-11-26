@@ -391,7 +391,7 @@
           </div>
           <div class="form-floating mb-3">{{form.file}}</div>
           <div class="form-floating mb-3" style="display: none">
-            {{form.associate_folder}}
+            <input type="text" name="associate_folder" maxlength="45" id="id_associate_folder" class=" form-control">
           </div>
           {%csrf_token%}
           <button class="form-control btn btn-dark mt-3" type="submit">

@@ -1,8 +1,11 @@
 from django.conf import settings
 from django.db import models
 from django.core.files import File
+import os
 from io import BytesIO
+import hashlib
 from django.utils.timezone import now
+
 
 # The `Notification` class represents a notification message with a recipient, message content, read
 # status, and timestamp.
@@ -19,21 +22,19 @@ class Notification(models.Model):
         return str(self.message)
     
 
-
-class FileData(models.Model):
+class FileTable(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
-    file = models.FileField(default='', blank=True, upload_to=f'./')
+    original_filename = models.CharField(max_length=255)
+    file_size = models.IntegerField()
+    file_path = models.CharField(max_length=255)
     associate_folder = models.CharField(default='', blank=True, max_length=45)
+    identifier = models.CharField(max_length=255, unique=True)
     created = models.DateTimeField(auto_now=True)
-    updated = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        # return str('%s%s%s' % (self.file, '-', self.associate_folder))
-        return str(self.file)
-
-    def __unicode__(self):
-        return self.file
+    updated = models.DateTimeField(default=now)
     
+    class Meta:
+        ordering = ['-created']
+        
     @property
     def get_folder(self):
         """
@@ -47,6 +48,60 @@ class FileData(models.Model):
         except Exception as e:
             return None
 
+
+def save_file(file_object, extras:dict):
+    # Generate a unique identifier using SHA-256
+    identifier = hashlib.sha256(file_object.read()).hexdigest()
+
+    # Store the file information
+    try:
+        file = FileTable(
+            user_id = int(extras["user"]),
+            original_filename=file_object.name,
+            file_size=file_object.size,
+            file_path=file_object.temporary_file_path(),
+            associate_folder = extras["folder"],
+            identifier=identifier
+        )
+        file.save()
+    except:
+        file = FileTable(
+            user_id = int(extras["user"]),
+            original_filename=file_object.name,
+            file_size=file_object.size,
+            file_path=file_object.temporary_file_path,
+            associate_folder = extras["folder"],
+            identifier=identifier
+        )
+        file.save()
+
+    # Store the actual file using the identifier
+    with open(os.path.join(settings.MEDIA_ROOT, identifier), 'wb') as f:
+        f.write(file_object.read())
+
+def retrieve_file(filename):
+    # Query the database to find the file's identifier
+    file = FileTable.objects.get(original_filename=filename)
+    identifier = file.identifier
+
+    # Retrieve the file from the filesystem using the identifier
+    with open(os.path.join(settings.MEDIA_ROOT, identifier), 'rb') as f:
+        file_content = f.read()
+
+    # Return the file content
+    return file_content
+
+
+class FileData(models.Model):
+    file = models.FileField(default='', blank=True, upload_to=f'./')
+
+    def __str__(self):
+        # return str('%s%s%s' % (self.file, '-', self.associate_folder))
+        return str(self.file)
+
+    def __unicode__(self):
+        return self.file
+    
     # def save(self, *args, **kwargs):
     #     """
     #     The `save` function saves a file with a specific filename format and then calls the parent class's
@@ -57,13 +112,10 @@ class FileData(models.Model):
     #     self.file.save(fname, File(buffer), save=False)
     #     super().save(*args, **kwargs)
 
-    class Meta:
-        ordering = ['-created']
-
 
 class Folder(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
-    folder = models.CharField(default='', blank=False, max_length=45, unique=True)
+    folder = models.CharField(default='', blank=False, max_length=45)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now_add=True)
 

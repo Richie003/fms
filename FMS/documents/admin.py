@@ -23,5 +23,6 @@ class SubFolderAdmin(admin.ModelAdmin):
 admin.site.register(Share, ShareAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(SubFolder, SubFolderAdmin)
+admin.site.register(FileTable)
 admin.site.register(FileData)
 admin.site.register(Folder)

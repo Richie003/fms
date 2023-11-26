@@ -1,9 +1,5 @@
-from email import message
-import json
 import uuid
 import random
-
-from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -11,9 +7,8 @@ from django.contrib.auth.decorators import login_required
 
 from accounts.forms import UserAdminCreationForm
 from django.views.decorators.csrf import csrf_protect
-from accounts.models import UserBio
-from urllib.parse import quote_plus
-from .models import FileData, Folder, Share, Notification
+# from urllib.parse import quote_plus
+from .models import FileTable, FileData, Folder, Share, Notification, save_file
 from .forms import FileDataForm, FolderDataForm
 import secrets
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -35,14 +30,14 @@ from django.contrib import messages
 @csrf_protect
 def index(request):
     """
-    The `index` function is a view function in a Django web application that handles requests to the
-    homepage, performs various operations such as creating users, adding files and folders, and renders
-    the homepage template with the necessary data.
-    
-    :param request: The `request` parameter is an object that represents the HTTP request made by the
-    user. It contains information about the request, such as the user making the request, the method
-    used (GET or POST), any data sent with the request, and other metadata
-    :return: a rendered HTML template called "index/index.html" with the context variables passed to it.
+        The `index` function is a view function in a Django web application that handles requests to the
+        homepage, performs various operations such as creating users, adding files and folders, and renders
+        the homepage template with the necessary data.
+        
+        :param request: The `request` parameter is an object that represents the HTTP request made by the
+        user. It contains information about the request, such as the user making the request, the method
+        used (GET or POST), any data sent with the request, and other metadata
+        :return: a rendered HTML template called "index/index.html" with the context variables passed to it.
     """
     user = request.user
     symbols = ["!", "@", "_", "*", "&", "%", "$", "#", "-", "(", ")"]
@@ -51,8 +46,8 @@ def index(request):
     randomm = secrets.token_hex()
     randomm = "%s%s%s%s" % (symbol, randomm[:4], symbol, nums)
     folder_data = Folder.objects.all().filter(user=request.user)
-    file_data = FileData.objects.all().filter(
-        user=request.user, associate_folder="Images"
+    file_data = FileTable.objects.all().filter(
+        user=request.user
     )
     folder_count = folder_data.count()
     # nums = secrets.token_urlsafe()
@@ -73,11 +68,19 @@ def index(request):
             form = FileDataForm(request.POST or None, request.FILES)
             if form.is_valid():
                 file_doc = form.cleaned_data.get("file")
+                extras = {
+                    "user":request.user.id,
+                    "folder":request.POST.get("associate_folder")
+                }
+                save_file(
+                    file_doc, 
+                    extras
+                )
                 if file_doc is None:
                     messages.warning(request, "No file selected")
                 else:
                     instance = form.save(commit=False)
-                    instance.user = user
+                    instance.user_id = request.user.id
                     instance.save()
                 return redirect("home")
         if "folder-add" in request.POST:
@@ -140,7 +143,8 @@ def remove_all(request):
 
 def folderItems(request, name):
     try:
-        folder_items = FileData.objects.filter(user=request.user, associate_folder=name)
+        query_file = None
+        folder_items = FileTable.objects.filter(user=request.user, associate_folder=name)
         file_count = folder_items.count()
         context = {"folder_items": folder_items, "file_count": file_count}
 
@@ -186,7 +190,6 @@ def generate_share_url(request):
             access_url = f"http://localhost:8000/surl/{access_link}/{uidb64}"
             return JsonResponse({"res": access_url}, safe=False)
 
-
 @login_required
 def validate_share_url(request, access_link, uidb64):
     """
@@ -222,7 +225,6 @@ def validate_share_url(request, access_link, uidb64):
     except Exception as e:
         return reverse(index)
 
-
 def grant_access_via_email(request, access_link, ID):
     """
     The function grants access to a user via email by adding their ID to the sharee list of a Share
@@ -241,7 +243,6 @@ def grant_access_via_email(request, access_link, ID):
     query_share_model.sharee.add(int(decode_user_id))
     print(query_share_model.sharee)
     return redirect('/')
-    
 
 def third_party_access(request, author, file, external_id):
     """
@@ -271,11 +272,14 @@ def third_party_access(request, author, file, external_id):
         return HttpResponse(mssg)
 
 def download(request, file_name):
-    file_path = settings.MEDIA_ROOT + "/" + file_name
-    file_wrapper = FileWrapper(open(file_path, "rb"))
-    file_mimetype = mimetypes.guess_type(file_path)
-    response = HttpResponse(file_wrapper, content_type=file_mimetype)
-    response["X-Sendfile"] = file_path
-    response["Content-Length"] = os.stat(file_path).st_size
-    response["Content-Disposition"] = "attachment; filename=%s" % str(file_name)
+    file = FileTable.objects.get(original_filename=file_name)
+    identifier = file.identifier
+
+    # Retrieve the file content from the filesystem using the identifier
+    with open(os.path.join(settings.MEDIA_ROOT, identifier), 'rb') as f:
+        file_content = f.read()
+
+    # Return the file as a response with the original filename
+    response = HttpResponse(file_content, content_type='application/octet-stream')
+    response['Content-Disposition'] = 'attachment; filename=%s' % file_name
     return response
