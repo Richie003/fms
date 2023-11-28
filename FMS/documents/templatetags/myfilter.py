@@ -5,12 +5,10 @@ from django.shortcuts import redirect
 from django.template.defaultfilters import stringfilter
 from accounts.models import UserBio
 from django.urls import reverse
-
 from documents.models import *
 from documents.forms import FolderDataForm
 
 register = template.Library()
-
 
 @register.filter(safe=True)
 def truncate(value):
@@ -21,7 +19,6 @@ def truncate(value):
         trunc = value
     return trunc
 
-
 @register.filter(autoescape=True, is_safe=True)
 @stringfilter
 def get_objects(value):
@@ -31,7 +28,6 @@ def get_objects(value):
     #         Q(associate_folder__icontains=value)
     #     )
     return query
-
 
 @register.inclusion_tag('documents/bio.html', takes_context=True)
 def bio(context):

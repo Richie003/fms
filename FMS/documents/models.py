@@ -6,7 +6,6 @@ from io import BytesIO
 import hashlib
 from django.utils.timezone import now
 
-
 # The `Notification` class represents a notification message with a recipient, message content, read
 # status, and timestamp.
 class Notification(models.Model):
@@ -20,7 +19,6 @@ class Notification(models.Model):
         
     def __str__(self):
         return str(self.message)
-    
 
 class FileTable(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -28,7 +26,7 @@ class FileTable(models.Model):
     file_size = models.IntegerField()
     file_path = models.CharField(max_length=255)
     associate_folder = models.CharField(default='', blank=True, max_length=45)
-    identifier = models.CharField(max_length=255, unique=True)
+    identifier = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(default=now)
     
@@ -48,7 +46,6 @@ class FileTable(models.Model):
         except Exception as e:
             return None
 
-
 def save_file(file_object, extras:dict):
     # Generate a unique identifier using SHA-256
     identifier = hashlib.sha256(file_object.read()).hexdigest()
@@ -63,7 +60,6 @@ def save_file(file_object, extras:dict):
             associate_folder = extras["folder"],
             identifier=identifier
         )
-        file.save()
     except:
         file = FileTable(
             user_id = int(extras["user"]),
@@ -73,7 +69,7 @@ def save_file(file_object, extras:dict):
             associate_folder = extras["folder"],
             identifier=identifier
         )
-        file.save()
+    file.save()
 
     # Store the actual file using the identifier
     with open(os.path.join(settings.MEDIA_ROOT, identifier), 'wb') as f:
@@ -91,8 +87,8 @@ def retrieve_file(filename):
     # Return the file content
     return file_content
 
-
 class FileData(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
     file = models.FileField(default='', blank=True, upload_to=f'./')
 
     def __str__(self):
@@ -111,7 +107,6 @@ class FileData(models.Model):
     #     buffer = BytesIO()
     #     self.file.save(fname, File(buffer), save=False)
     #     super().save(*args, **kwargs)
-
 
 class Folder(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)

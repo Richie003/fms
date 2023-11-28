@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 from accounts.forms import UserAdminCreationForm
+from accounts.models import User
 from django.views.decorators.csrf import csrf_protect
 # from urllib.parse import quote_plus
 from .models import FileTable, FileData, Folder, Share, Notification, save_file
@@ -102,7 +103,6 @@ def index(request):
     }
     return render(request, "index/index.html", context)
 
-
 # Returns the folders belonging to logged in user
 def get_folders(request):
     data = []
@@ -142,15 +142,15 @@ def remove_all(request):
 
 
 def folderItems(request, name):
+    print(name)
     try:
-        query_file = None
-        folder_items = FileTable.objects.filter(user=request.user, associate_folder=name)
+        folder_items = FileTable.objects.filter(user_id=request.user.id, associate_folder=name)
         file_count = folder_items.count()
         context = {"folder_items": folder_items, "file_count": file_count}
 
         return render(request, "index/files.html", context)
     except Exception as e:
-        return Http404()
+        return e
 
 
 def generate_share_url(request):
@@ -167,7 +167,7 @@ def generate_share_url(request):
     """
     if request.method == "GET":
         id = request.GET["Id"]
-        FILE = FileData.objects.get(id=int(id))
+        FILE = FileTable.objects.get(id=int(id))
 
         # Check if the file already has an access link
         share_exists = Share.objects.filter(file_id=id, access_link__isnull=False).exists()
@@ -211,8 +211,8 @@ def validate_share_url(request, access_link, uidb64):
         decode_file_id = force_str(urlsafe_base64_decode(uidb64))
         if request.user in query_share_model.sharee.all():
             new_uidb64 = urlsafe_base64_encode(force_bytes(request.user.id))
-            query_filedata = FileData.objects.get(id=int(decode_file_id))
-            return redirect(f'/{query_share_model.sharer}/{query_filedata}/{new_uidb64}')
+            query_filedata = FileTable.objects.get(id=int(decode_file_id))
+            return redirect(f'/{query_share_model.sharer}/{query_filedata.associate_folder}/{query_filedata.original_filename}/{new_uidb64}')
         else:
             new_uidb64 = urlsafe_base64_encode(force_bytes(request.user.id))
             data = {
@@ -244,7 +244,7 @@ def grant_access_via_email(request, access_link, ID):
     print(query_share_model.sharee)
     return redirect('/')
 
-def third_party_access(request, author, file, external_id):
+def third_party_access(request, author, folder, file, external_id):
     """
     The function `third_party_access` checks if the user making the request has access to a file based
     on their user ID and an external ID, and returns the file data if they have access, otherwise it
@@ -264,15 +264,16 @@ def third_party_access(request, author, file, external_id):
     """
     decode_external_id = force_str(urlsafe_base64_decode(external_id))
     if int(request.user.id) == int(decode_external_id):
-        query_filedata = FileData.objects.filter(file=file)
-        context = {"file_items":query_filedata, 'author':author}
+        user = User.objects.get(username=author).id
+        query_filedata = FileTable.objects.get(user_id=user, associate_folder=folder, original_filename=file)
+        context = {"items":query_filedata, 'author':author}
         return render(request, 'index/third_party.html', context)
     else:
         mssg = f"<h1>Haha..., Joke's on you!</h1>\n<p>Now you would never have access to this file bozoo</p>"
         return HttpResponse(mssg)
 
-def download(request, file_name):
-    file = FileTable.objects.get(original_filename=file_name)
+def download(request, file_name, folder):
+    file = FileTable.objects.get(original_filename=file_name, associate_folder=folder)
     identifier = file.identifier
 
     # Retrieve the file content from the filesystem using the identifier
