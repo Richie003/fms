@@ -52,11 +52,30 @@
   </head>
   {%block styles%}
     <style>
+      a:hover{
+        color:#00e7ff !important;
+        text-decoration: none !important;
+      }
       .navbar{
         justify-content:center !important;
       }
       .notify{
         animation: 1s ring infinite;
+      }
+      .invincible{
+        display:none;
+      }
+      .opaque{
+        animation: 0.5s show ease-in-out;
+      }
+
+      @keyframes show{
+        from{
+          opacity:0.5;
+        }
+        to{
+          opacity:1;
+        }
       }
       @keyframes ring{
         25%{
@@ -92,13 +111,12 @@
           <i class="bi-share"></i>
         </a>
         <a class="nav-link" id="filee-upload-trigger"
-          >Upload File<i class="bi-files"></i
-        ></a>
+          >Upload <i class="bi bi-upload"></i></a>
         <a
           class="nav-link"
           onclick="folderFormTrigger(this)"
           style="cursor: pointer"
-          >New Folder</a
+          >Add Folder <i class="bi bi-plus-square-fill"></i></a
         >
         {%if request.user.is_authenticated%}
         <a class="nav-link" href="{%url 'log_out' request.user.pk%}"
@@ -114,25 +132,6 @@
         <!--        <a class="nav-link" href="#">Link</a>-->
       </nav>
     </div>
-
-    {%for message in messages%}
-    <div class="jumbotron bg-info text-center py-2 mt-3 text-white h4">
-      <span class="d-flex align-items-center justify-content-center">
-        {{message}}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="15"
-          height="15"
-          viewBox="0 0 384 512"
-        >
-          <path
-            d="M288 248v28c0 6.6-5.4 12-12 12H108c-6.6 0-12-5.4-12-12v-28c0-6.6 5.4-12 12-12h168c6.6 0 12 5.4 12 12zm-12 72H108c-6.6 0-12 5.4-12 12v28c0 6.6 5.4 12 12 12h168c6.6 0 12-5.4 12-12v-28c0-6.6-5.4-12-12-12zm108-188.1V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V48C0 21.5 21.5 0 48 0h204.1C264.8 0 277 5.1 286 14.1L369.9 98c9 8.9 14.1 21.2 14.1 33.9zm-128-80V128h76.1L256 51.9zM336 464V176H232c-13.3 0-24-10.7-24-24V48H48v416h288z"
-            fill="#fff"
-          />
-        </svg>
-      </span>
-    </div>
-    {%endfor%}
 
     <main role="main" class="container py-5 mt-auto">
       <div class="row">
@@ -277,56 +276,57 @@
           </ul>
         </div>
         <div class="col-md-8 order-md-1">
-          <div class="p-3 my-3 text-white bg-dark rounded shadow-sm">
-            C:{{request.path}}
-            <!-- <form class="form-inline my-2 my-lg-0" action="" method="GET">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Find your Files" aria-label="Search" id="code">
-                    <button class="but btn btn-dark my-2 my-sm-0 generate" type="button" id="generate">
-                        <svg width="19" height="25" viewBox="0 0 297 297" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g id="search-svgrepo-com 1">
-                                <g id="Group">
-                                    <g id="Group_2">
-                                        <path id="Vector"
-                                              d="M206.508 167.062C164.287 167.062 129.938 132.713 129.938 90.4922C129.938 48.2712 164.287 13.9219 206.508 13.9219C248.729 13.9219 283.078 48.2712 283.078 90.4922C283.078 132.713 248.729 167.062 206.508 167.062Z"
-                                              fill="#BBF1FB"/>
-                                    </g>
-                                    <g id="Group_3">
-                                        <path id="Vector_2"
-                                              d="M139.217 146.179L120.655 164.742L132.256 176.343L150.818 157.781L139.217 146.179Z"
-                                              fill="#8A8895"/>
-                                    </g>
-                                    <g id="Group_4">
-                                        <path id="Vector_3"
-                                              d="M134.569 176.759C132.829 172.898 129.797 169.641 128.582 168.425C126.385 166.224 120.629 161.108 114.656 161.108C112.109 161.108 109.838 162.033 108.012 163.866L4.07853 273.232C1.4502 275.864 0 279.36 0 283.078C0 286.796 1.4502 290.293 4.07853 292.921C6.70744 295.552 10.2059 297 13.9219 297C17.6379 297 21.1369 295.552 23.6788 293.005L133.218 188.908C134.977 187.152 137.488 183.237 134.569 176.759Z"
-                                              fill="#7E5C62" fill-opacity="0.66"/>
-                                    </g>
-                                    <g id="Group_5">
-                                        <path id="Vector_4"
-                                              d="M206.508 0C156.612 0 116.016 40.5939 116.016 90.4922C116.016 140.391 156.612 180.984 206.508 180.984C256.404 180.984 297 140.391 297 90.4922C297 40.5939 256.404 0 206.508 0ZM206.508 167.062C164.287 167.062 129.938 132.713 129.938 90.4922C129.938 48.2712 164.287 13.9219 206.508 13.9219C248.729 13.9219 283.078 48.2712 283.078 90.4922C283.078 132.713 248.729 167.062 206.508 167.062Z"
-                                              fill="#5C546A"/>
-                                    </g>
-                                    <g id="Group_6">
-                                        <path id="Vector_5"
-                                              d="M134.569 176.759C132.829 172.898 129.797 169.641 128.582 168.425L128.579 168.421L4.07855 292.921C6.70747 295.552 10.2059 297 13.9219 297C17.6379 297 21.1369 295.552 23.6788 293.005L133.218 188.908C134.977 187.152 137.488 183.237 134.569 176.759Z"
-                                              fill="#9E6459"/>
-                                    </g>
-                                    <g id="Group_7">
-                                        <path id="Vector_6"
-                                              d="M95.8503 176.663L120.337 201.15L127.067 194.754L102.246 169.933L95.8503 176.663Z"
-                                              fill="#5C546A"/>
-                                    </g>
-                                    <g id="Group_8">
-                                        <path id="reflection"
-                                              d="M225.07 99.7734C209.717 99.7734 197.227 87.2826 197.227 71.9297C197.227 56.5768 209.717 44.0859 225.07 44.0859C240.423 44.0859 252.914 56.5768 252.914 71.9297C252.914 87.2826 240.423 99.7734 225.07 99.7734Z"
-                                              fill="white"/>
-                                    </g>
-                                </g>
+          <div class="p-3 my-3 text-white bg-dark rounded shadow-sm d-flex justify-content-between align-items-center">
+            <span>C:{{request.path}}</span>
+            <button class="but btn btn-dark my-2 my-sm-0 generate border-0" type="button" id="generate">
+                <svg width="19" height="25" viewBox="0 0 297 297" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="search-svgrepo-com 1">
+                        <g id="Group">
+                            <g id="Group_2">
+                                <path id="Vector"
+                                      d="M206.508 167.062C164.287 167.062 129.938 132.713 129.938 90.4922C129.938 48.2712 164.287 13.9219 206.508 13.9219C248.729 13.9219 283.078 48.2712 283.078 90.4922C283.078 132.713 248.729 167.062 206.508 167.062Z"
+                                      fill="#BBF1FB"/>
                             </g>
-                        </svg>
-                    </button>
-                </form> -->
+                            <g id="Group_3">
+                                <path id="Vector_2"
+                                      d="M139.217 146.179L120.655 164.742L132.256 176.343L150.818 157.781L139.217 146.179Z"
+                                      fill="#8A8895"/>
+                            </g>
+                            <g id="Group_4">
+                                <path id="Vector_3"
+                                      d="M134.569 176.759C132.829 172.898 129.797 169.641 128.582 168.425C126.385 166.224 120.629 161.108 114.656 161.108C112.109 161.108 109.838 162.033 108.012 163.866L4.07853 273.232C1.4502 275.864 0 279.36 0 283.078C0 286.796 1.4502 290.293 4.07853 292.921C6.70744 295.552 10.2059 297 13.9219 297C17.6379 297 21.1369 295.552 23.6788 293.005L133.218 188.908C134.977 187.152 137.488 183.237 134.569 176.759Z"
+                                      fill="#7E5C62" fill-opacity="0.66"/>
+                            </g>
+                            <g id="Group_5">
+                                <path id="Vector_4"
+                                      d="M206.508 0C156.612 0 116.016 40.5939 116.016 90.4922C116.016 140.391 156.612 180.984 206.508 180.984C256.404 180.984 297 140.391 297 90.4922C297 40.5939 256.404 0 206.508 0ZM206.508 167.062C164.287 167.062 129.938 132.713 129.938 90.4922C129.938 48.2712 164.287 13.9219 206.508 13.9219C248.729 13.9219 283.078 48.2712 283.078 90.4922C283.078 132.713 248.729 167.062 206.508 167.062Z"
+                                      fill="#5C546A"/>
+                            </g>
+                            <g id="Group_6">
+                                <path id="Vector_5"
+                                      d="M134.569 176.759C132.829 172.898 129.797 169.641 128.582 168.425L128.579 168.421L4.07855 292.921C6.70747 295.552 10.2059 297 13.9219 297C17.6379 297 21.1369 295.552 23.6788 293.005L133.218 188.908C134.977 187.152 137.488 183.237 134.569 176.759Z"
+                                      fill="#9E6459"/>
+                            </g>
+                            <g id="Group_7">
+                                <path id="Vector_6"
+                                      d="M95.8503 176.663L120.337 201.15L127.067 194.754L102.246 169.933L95.8503 176.663Z"
+                                      fill="#5C546A"/>
+                            </g>
+                            <g id="Group_8">
+                                <path id="reflection"
+                                      d="M225.07 99.7734C209.717 99.7734 197.227 87.2826 197.227 71.9297C197.227 56.5768 209.717 44.0859 225.07 44.0859C240.423 44.0859 252.914 56.5768 252.914 71.9297C252.914 87.2826 240.423 99.7734 225.07 99.7734Z"
+                                      fill="white"/>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </button>
           </div>
-
+          <div class="container px-4 invincible" id="search-cont" data-boolean="False">
+            <form method="GET" action="" id>
+                <input type="text" name="search" class="form-control" id="search-input" placeholder="example.txt">
+            </form>
+          </div>
           {%block content%} {%endblock%}
         </div>
       </div>
@@ -625,6 +625,23 @@
                 upload_file_href.addClass('d-none')
             }
     </script>
+    <script>
+      $(document).ready(() => {
+        $("#generate").click((e) => {
+          const openedORclosed = $("#search-cont").attr('data-boolean')
+          if(openedORclosed === "False"){
+            $("#search-cont").removeClass('invincible')
+            $("#search-cont").addClass('opaque')
+            $("#search-cont").attr('data-boolean', 'True')
+          }else{
+            $("#search-cont").addClass('invincible')
+            $("#search-cont").removeClass('opaque')
+            $("#search-cont").attr('data-boolean', 'False')
+          }
+        });
+      });
+      
+  </script>
     {%block scripts%} {%endblock%}
     <script src="{%static 'js/bootstrap.bundle.min.js'%}"></script>
     <script src="{%static 'js/offcanvas.js' %}"></script>

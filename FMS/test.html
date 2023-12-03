@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Search Bar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css">
+    <style>
+        .search-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .search-input {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            width: 0;
+            height: 38px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .search-input:focus {
+            outline: none;
+        }
+
+        .search-icon:hover .search-input {
+            width: 200px;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search">
+                    <div class="search-icon">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="search-input" placeholder="Search">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -18,5 +18,7 @@ urlpatterns = [
     path("sharefile/", views.generate_share_url, name="gen_link"),
     path('surl/<str:access_link>/<str:uidb64>/', views.validate_share_url, name='share_url'),
     path("authorize/<str:access_link>/<str:ID>/", views.grant_access_via_email),
-    path("<str:author>/<str:folder>/<str:file>/<str:external_id>/", views.third_party_access, name="third_party")
+    path("<str:author>/<str:folder>/<str:file>/<str:external_id>/", views.third_party_access, name="third_party"),
+    # Search Files URL path
+    path('searchfiles/', views.searchFiles, name='searchfiles')
 ]

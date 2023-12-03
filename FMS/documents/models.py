@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.core.files import File
+from django.db.models import Q
 import os
 from io import BytesIO
 import hashlib
@@ -32,7 +33,40 @@ class FileTable(models.Model):
     
     class Meta:
         ordering = ['-created']
+    
+    @classmethod
+    def search_files(cls, associate_folder=None, user_id=None, filename=None):
+        """
+        The function `search_files` filters files based on the provided parameters and returns the result in
+        descending order of creation.
         
+        :param cls: The `cls` parameter refers to the class itself. In this case, it is likely a reference
+        to the model class that this method belongs to
+        :param associate_folder: The `associate_folder` parameter is used to filter the search results based
+        on the associated folder. It is an optional parameter and if provided, the search will only return
+        files that are associated with the specified folder
+        :param user_id: The user_id parameter is used to filter the search results based on the user ID
+        :param filename: The `filename` parameter is used to search for files based on their original
+        filename. It is a string that represents the name of the file or a part of it. The search is
+        case-insensitive and it uses the `icontains` lookup to find files that contain the specified
+        filename as a substring
+        :return: a queryset of objects that match the specified filters. The queryset is ordered by the
+        'created' field in descending order.
+        """
+        query = Q()
+
+        if associate_folder is not None:
+            query &= Q(associate_folder=associate_folder)
+
+        if user_id is not None:
+            query &= Q(user_id=user_id)
+
+        if filename is not None:
+            query &= Q(original_filename__icontains=filename)
+
+        # Apply the filter and return the result
+        return cls.objects.filter(query).order_by('-created')
+    
     @property
     def get_folder(self):
         """

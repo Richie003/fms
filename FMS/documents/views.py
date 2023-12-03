@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 from accounts.forms import UserAdminCreationForm
 from accounts.models import User
@@ -14,6 +15,7 @@ from .forms import FileDataForm, FolderDataForm
 import secrets
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
+from django.db.models import Q
 import urllib, mimetypes
 from django.http import HttpResponse, Http404, StreamingHttpResponse, FileResponse
 import os
@@ -146,7 +148,7 @@ def folderItems(request, name):
     try:
         folder_items = FileTable.objects.filter(user_id=request.user.id, associate_folder=name)
         file_count = folder_items.count()
-        context = {"folder_items": folder_items, "file_count": file_count}
+        context = {"folder_items": folder_items, "file_count": file_count, "name":name}
 
         return render(request, "index/files.html", context)
     except Exception as e:
@@ -271,6 +273,36 @@ def third_party_access(request, author, folder, file, external_id):
     else:
         mssg = f"<h1>Haha..., Joke's on you!</h1>\n<p>Now you would never have access to this file bozoo</p>"
         return HttpResponse(mssg)
+
+
+# Search files functionality
+def searchFiles(request):
+    extracts = []
+    if request.method == "GET":
+        data = request.GET["dts"]
+        folder = request.GET["folder"]
+        query_file = FileTable.search_files(
+            filename=data, 
+            user_id=request.user.id, 
+            associate_folder=folder
+        )
+        for i in query_file:
+            # The above code is converting a string representation of a date and time in the format
+            # "%Y-%m-%dT%H:%M:%S.%fZ" to a datetime object using the `strptime()` function from the `datetime`
+            # module in Python. It then formats the datetime object into a string representation in the format "%a
+            # %d %b %Y" using the `strftime()` function. The resulting formatted date is stored in the variable
+            # `formatted_date`.
+            dt_object = datetime.strptime(str(i.created), "%Y-%m-%d %H:%M:%S.%f%z")
+            formatted_date = dt_object.strftime("%a %d %b %Y")
+            extracts.append({
+                "pk":i.pk,
+                "filename":i.original_filename,
+                "folder":i.associate_folder,
+                "created":formatted_date,
+            })
+            
+        return JsonResponse({"res":extracts}, safe=False)
+
 
 def download(request, file_name, folder):
     file = FileTable.objects.get(original_filename=file_name, associate_folder=folder)
