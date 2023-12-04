@@ -151,7 +151,7 @@ $('#search-input').keyup((e)=>{
                                     <a class="filename text-gray-dark fw-bolder" href="/mediafiles/${i["filename"]}">${i["filename"]}</a>
                                 </div>
                                 <div class="">
-                                <button class="btn btn-sm btn-light px-2 flex-shrink-0 get_folder" type="button" onclick="removeFile()">
+                                <button class="btn btn-sm btn-light px-2 flex-shrink-0 get_folder" type="button" onclick="removeFile('/delete/file/${i["pk"]}', '/folder/${i["folder"]}')">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="20" width="15" viewBox="0 0 448 512">
                                     <path d="M268 416h24a12 12 0 0 0 12-12V188a12 12 0 0 0-12-12h-24a12
                                     12 0 0 0-12 12v216a12 12 0 0 0 12 12zM432
@@ -159,7 +159,7 @@ $('#search-input').keyup((e)=>{
                                     48h288a48 48 0 0 0 48-48V128h16a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16zM171.84 50.91A6 6 0 0 1 177 48h94a6 6 0 0 1 5.15 2.91L293.61 80H154.39zM368 464H80V128h288zm-212-48h24a12 12 0 0 0 12-12V188a12 12 0 0 0-12-12h-24a12 12 0 0 0-12 12v216a12 12 0 0 0 12 12z" fill="#ff0000"/>
                                 </svg>
                                 </button>
-                                <a class="btn btn-sm btn-light buttss" href="/download/${i["filename"]}/${i["folder"]}/s" id="new_file" type="button">
+                                <a class="btn btn-sm btn-light buttss" href="/download/${i["filename"]}/${i["folder"]}" id="new_file" type="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="20" width="15" viewBox="0 0 512 512">
                                         <path d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z" fill="#00e7ff"/>
                                     </svg>

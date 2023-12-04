@@ -127,7 +127,7 @@ def remove_folder(request, pk):
 
 
 def remove_file(request, pk):
-    file = FileData.objects.get(pk=pk)
+    file = FileTable.objects.get(pk=pk)
     file.delete()
 
     return HttpResponse("success", content_type="text/plain")
@@ -138,7 +138,7 @@ def remove_all(request):
         file_ids = request.POST.getlist("files_ids[]")
         print(f"IDs:{file_ids}")
         for i in file_ids:
-            file = FileData.objects.get(pk=int(i))
+            file = FileTable.objects.get(pk=int(i))
             file.delete()
         return JsonResponse({"mssg": "Done!"}, safe=False)
 
@@ -157,15 +157,15 @@ def folderItems(request, name):
 
 def generate_share_url(request):
     """
-    The function generates a share URL for a file, either by retrieving an existing access link or
-    creating a new one.
-    
-    :param request: The `request` parameter is an object that represents the HTTP request made by the
-    client. It contains information such as the request method (GET, POST, etc.), headers, and any data
-    sent with the request. In this case, the `request` object is used to retrieve the value of the
-    :return: The function `generate_share_url` returns a JSON response containing the access URL. The
-    access URL is either the existing access link if it already exists for the file, or a newly
-    generated access link if it doesn't exist.
+        The function generates a share URL for a file, either by retrieving an existing access link or
+        creating a new one.
+        
+        :param request: The `request` parameter is an object that represents the HTTP request made by the
+        client. It contains information such as the request method (GET, POST, etc.), headers, and any data
+        sent with the request. In this case, the `request` object is used to retrieve the value of the
+        :return: The function `generate_share_url` returns a JSON response containing the access URL. The
+        access URL is either the existing access link if it already exists for the file, or a newly
+        generated access link if it doesn't exist.
     """
     if request.method == "GET":
         id = request.GET["Id"]
@@ -274,13 +274,13 @@ def third_party_access(request, author, folder, file, external_id):
         mssg = f"<h1>Haha..., Joke's on you!</h1>\n<p>Now you would never have access to this file bozoo</p>"
         return HttpResponse(mssg)
 
-
 # Search files functionality
 def searchFiles(request):
     extracts = []
     if request.method == "GET":
         data = request.GET["dts"]
         folder = request.GET["folder"]
+        folder_path = request.path
         query_file = FileTable.search_files(
             filename=data, 
             user_id=request.user.id, 
@@ -298,6 +298,7 @@ def searchFiles(request):
                 "pk":i.pk,
                 "filename":i.original_filename,
                 "folder":i.associate_folder,
+                "path":folder_path,
                 "created":formatted_date,
             })
             

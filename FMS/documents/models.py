@@ -94,12 +94,12 @@ def save_file(file_object, extras:dict):
             associate_folder = extras["folder"],
             identifier=identifier
         )
-    except:
+    except AttributeError:
         file = FileTable(
             user_id = int(extras["user"]),
             original_filename=file_object.name,
             file_size=file_object.size,
-            file_path=file_object.temporary_file_path,
+            file_path="",
             associate_folder = extras["folder"],
             identifier=identifier
         )
