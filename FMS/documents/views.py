@@ -1,6 +1,5 @@
-import uuid
-import random
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+import uuid, random, urllib, mimetypes, os, secrets
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -9,22 +8,13 @@ from datetime import datetime
 from accounts.forms import UserAdminCreationForm
 from accounts.models import User
 from django.views.decorators.csrf import csrf_protect
-# from urllib.parse import quote_plus
-from .models import FileTable, FileData, Folder, Share, Notification, save_file
+from .models import FileTable, FileData, Folder, Share, Notification, save_file, save_subfolder
 from .forms import FileDataForm, FolderDataForm
-import secrets
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
-from django.db.models import Q
-import urllib, mimetypes
-from django.http import HttpResponse, Http404, StreamingHttpResponse, FileResponse
-import os
 from email_app import sendEmail
-from django.template.defaultfilters import filesizeformat
 
-# from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from wsgiref.util import FileWrapper
 from django.contrib import messages
 
 
@@ -125,6 +115,22 @@ def remove_folder(request, pk):
 
     return HttpResponse("success", content_type="text/plain")
 
+
+def create_subfolder(request):
+    if request.method == "POST":
+        REQ = request.POST
+        user = request.user.id
+        parent_folder = REQ["parent_folder"]
+        folder = REQ["folder"]
+        data = {
+            "user":user,
+            "parent_folder":parent_folder,
+            "folder":folder
+        }
+        save_subfolder(
+            data = data
+        )
+    return JsonResponse({"res":"success"}, safe=True)
 
 def remove_file(request, pk):
     file = FileTable.objects.get(pk=pk)

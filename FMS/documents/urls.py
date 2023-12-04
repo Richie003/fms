@@ -5,11 +5,13 @@ import secrets
 random = secrets.token_urlsafe()
 
 urlpatterns = [
- # The code snippet is defining the URL patterns for a Django web application. Each `path` function
- # call represents a URL pattern that maps to a specific view function.
+# The code snippet is defining the URL patterns for a Django web application. Each `path` function
+# call represents a URL pattern that maps to a specific view function.
     path('', views.index, name='home'),
     path('folder/<str:name>/', views.folderItems, name='folder_files'),
     path('delete/<int:pk>/', views.remove_folder, name='delete_folder'),
+    # Create sub_folder
+    path('subfolder/', views.create_subfolder, name='create_subfolder'),
     path('delete/files/', views.remove_all, name='delete_all'),
     path('delete/file/<int:pk>/', views.remove_file, name='delete_file'),
     path('download/<str:file_name>/<str:folder>', views.download, name='download_file'),

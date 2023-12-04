@@ -1,68 +1,68 @@
 // Start
-    function getCookie(name){
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== ''){
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++){
-                var cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')){
-                    cookieValue = decodeURIComponent(cookie.substring(
-                        name.length + 1));
-                    break;
-                }
+function getCookie(name){
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== ''){
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++){
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')){
+                cookieValue = decodeURIComponent(cookie.substring(
+                    name.length + 1));
+                break;
             }
         }
-        return cookieValue;
     }
+    return cookieValue;
+}
 
-    function removeFile(fileURL, redirectURL) {
-        /* The code you provided is making an XMLHttpRequest to the server to delete a file. */
-        const csrftoken = getCookie('csrftoken');
-        let xmlhttp = new XMLHttpRequest();
+function removeFile(fileURL, redirectURL) {
+    /* The code you provided is making an XMLHttpRequest to the server to delete a file. */
+    const csrftoken = getCookie('csrftoken');
+    let xmlhttp = new XMLHttpRequest();
 
-        xmlhttp.onreadystatechange = function() {
-            if (xmlhttp.readyState == XMLHttpRequest.DONE){
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-                    window.location.replace(redirectURL);
-                }else{
-                    alert('there was an error');
-                }
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE){
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
+                window.location.replace(redirectURL);
+            }else{
+                alert('there was an error');
             }
         }
-        xmlhttp.open("DELETE", fileURL, true);
-        xmlhttp.setRequestHeader("X-CSRFToken", csrftoken)
-        xmlhttp.send();
-    };
-//
-    function userFileOptions(element) {
-    /* The code you provided is toggling the visibility of an element with the id 'Fileoption-dropdown'. */
-        var userFileOptionvar = document.getElementById('Fileoption-dropdown')
-
-        if (userFileOptionvar.classList.contains('d-none')){
-            userFileOptionvar.classList.remove('d-none')
-        }else{
-            userFileOptionvar.classList.add('d-none')
-        }
     }
+    xmlhttp.open("DELETE", fileURL, true);
+    xmlhttp.setRequestHeader("X-CSRFToken", csrftoken)
+    xmlhttp.send();
+};
 //
-    function selectOption(params) {
+function userFileOptions(element) {
+/* The code you provided is toggling the visibility of an element with the id 'Fileoption-dropdown'. */
+    var userFileOptionvar = document.getElementById('Fileoption-dropdown')
+
+    if (userFileOptionvar.classList.contains('d-none')){
+        userFileOptionvar.classList.remove('d-none')
+    }else{
+        userFileOptionvar.classList.add('d-none')
+    }
+}
+//
+function selectOption(params) {
 /* The code you provided is toggling the visibility of elements with the class name 'selector' and the
 element with the id 'delete-all'. */
-        var selecTor = document.getElementsByClassName('selector')
-        var deleteAllBtn = document.getElementById('delete-all')
-        for (let index = 0; index < selecTor.length; index++) {
-            if (selecTor[index].classList.contains('d-none')){
-                selecTor[index].classList.remove('d-none')
-            }else{
-                selecTor[index].classList.add('d-none')
-            }
-        }
-        if(deleteAllBtn.classList.contains('d-none')){
-            deleteAllBtn.classList.remove('d-none')
+    var selecTor = document.getElementsByClassName('selector')
+    var deleteAllBtn = document.getElementById('delete-all')
+    for (let index = 0; index < selecTor.length; index++) {
+        if (selecTor[index].classList.contains('d-none')){
+            selecTor[index].classList.remove('d-none')
         }else{
-            deleteAllBtn.classList.add('d-none')
+            selecTor[index].classList.add('d-none')
         }
     }
+    if(deleteAllBtn.classList.contains('d-none')){
+        deleteAllBtn.classList.remove('d-none')
+    }else{
+        deleteAllBtn.classList.add('d-none')
+    }
+}
 //
 // Sends the selected file(s) ids to the server side via an ajax `POST` request to delete from the database
 $( document ).ready(function() {
@@ -190,3 +190,24 @@ $('#search-input').keyup((e)=>{
         }
     })
 })
+
+console.log(`folder name: ${$('#folder_name').text()}`)
+// jQuery/AJax POST request to create sub_folder
+$(document).on("click", "#add-file", (e)=>{
+    e.preventDefault();
+    $.ajax({
+        type:"POST",
+        url:"/subfolder/",
+        data:{
+            "csrfmiddlewaretoken":getCookie('csrftoken'),
+            "folder":$("#sub_folder").val(),
+            "parent_folder":$('#folder_name').text(),
+        },
+        success: (res) => {
+            console.log(res)
+        },
+        error: () => {
+            console.log("An error occurred")
+        }
+    });
+});

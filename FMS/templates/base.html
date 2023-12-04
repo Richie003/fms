@@ -276,7 +276,7 @@
           </ul>
         </div>
         <div class="col-md-8 order-md-1">
-          <div class="p-3 my-3 text-white bg-dark rounded shadow-sm d-flex justify-content-between align-items-center">
+          <div class="py-2 px-3 my-3 text-white bg-dark rounded shadow-sm d-flex justify-content-between align-items-center">
             <span>C:{{request.path}}</span>
             <button class="but btn btn-dark my-2 my-sm-0 generate border-0" type="button" id="generate">
                 <svg width="19" height="25" viewBox="0 0 297 297" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -400,10 +400,7 @@
         </form>
       </div>
     </div>
-    <div
-      class="bg-modal4 rounded py-3 px-3 position-fixed"
-      id="folder_creation"
-    >
+    <div class="bg-modal4 rounded py-3 px-3 position-fixed" id="folder_creation">
       <div class="modal-content py-2 px-3">
         <div class="close" onclick="folderFormCancel(this)">+</div>
         <i class="bi-file" style="font-size: 300%; color: #757577"></i>
@@ -414,8 +411,13 @@
           enctype="multipart/form-data"
           id="add-file"
         >
+        {%csrf_token%}
           <input type="hidden" name="folder-add" />
-          {{form2.folder}} {%csrf_token%}
+          {%if request.path == "home" %}
+          {{form2.folder}}
+          {%else%}
+          <input type="text" class="form-control" value="" id="sub_folder" placeholder="Folder name:" >
+          {%endif%}
           <button class="form-control btn btn-dark mt-3" type="submit">
             Upload
           </button>
@@ -525,8 +527,8 @@
         </form>
       </div>
     </div>
-    <script src="{%static 'js/transcop.js'%}"></script>
     <script src="{%static 'js/jquery.js'%}"></script>
+    <script src="{%static 'js/base.js'%}"></script>
     <script>
       function handleClick(element) {
         document.querySelector(".bg-modal").style = "display:flex!important;";
@@ -625,23 +627,6 @@
                 upload_file_href.addClass('d-none')
             }
     </script>
-    <script>
-      $(document).ready(() => {
-        $("#generate").click((e) => {
-          const openedORclosed = $("#search-cont").attr('data-boolean')
-          if(openedORclosed === "False"){
-            $("#search-cont").removeClass('invincible')
-            $("#search-cont").addClass('opaque')
-            $("#search-cont").attr('data-boolean', 'True')
-          }else{
-            $("#search-cont").addClass('invincible')
-            $("#search-cont").removeClass('opaque')
-            $("#search-cont").attr('data-boolean', 'False')
-          }
-        });
-      });
-      
-  </script>
     {%block scripts%} {%endblock%}
     <script src="{%static 'js/bootstrap.bundle.min.js'%}"></script>
     <script src="{%static 'js/offcanvas.js' %}"></script>

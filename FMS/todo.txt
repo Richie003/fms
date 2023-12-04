@@ -1,7 +1,7 @@
 ~ Add users notification system.
 ~ create an algorithm and model for folders & sub-folders
 
-# DIAGRAMMATIC ILLUSTRATION OF THE FMS FOLDER(S) & SUB-FOLDERS
+# DIAGRAMMATIC ILLUSTRATION OF THE FMS FOLDER(s) & SUB-FOLDER(s)
     +-------------+
     | Main Folder |
     +-------------+

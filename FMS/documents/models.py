@@ -164,11 +164,26 @@ class SubFolder(models.Model):
     def __str__(self):
         return str('%s%s%s' % (self.user, '-', self.folder))
     
+def save_subfolder(data:dict):
+    try:
+        print(data["folder"])
+        parent_folder = Folder.objects.get(user_id=int(data["user"]), folder=data["parent_folder"]).id
+        sub_folder = SubFolder(
+            user_id = int(data["user"]),
+            folder = data["folder"],
+            parent_folder_id=int(parent_folder),
+        )
+        sub_folder.save()
+    except Exception as e:
+        print(e)
+        
+
+    
     class Meta:
         ordering = ['-created']
-        constraints = [
-                models.UniqueConstraint(fields=['parent_folder',], name='unique_folder_for_user')
-            ]
+        # constraints = [
+        #         models.UniqueConstraint(fields=['parent_folder',], name='unique_folder_for_user')
+        #     ]
 
 # The Share class represents a sharing relationship between users, files, and folders in a system,
 # with an access link and creation timestamp.
