@@ -39,7 +39,7 @@ def login_page(request):
     return render(request, 'accounts/login.html', context)
 
 
-def log_out(request, pk='first_name'):
+def log_out(request):
     # context={'num':num}
     logout(request)
     return redirect('login')

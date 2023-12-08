@@ -38,7 +38,7 @@
                         </span>
                         </button>
                 </form>
-              </div>
+            </div>
             </div>
         </div>
         <span class="d-none" id="folder_name">{{name}}</span>
@@ -49,7 +49,7 @@
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <div class="w-50" id="fileN-box">
                             <input type="checkbox" name="checked-file" value="{{items.pk}}" id="checked_all" class="d-none selector" checked>
-                            <a class="filename text-gray-dark fw-bolder" href="/mediafiles/{{items.original_filename}}">{{items.original_filename}}</a>
+                            <span class="filename text-gray-dark font-weight-bolder">{{items.original_filename}}</span>
                         </div>
                         <!-- <strong class="filename text-gray-dark">{{data.folder|get_objects}}</strong> -->
                         <div class="">
@@ -93,5 +93,10 @@
     {%endblock%}
 {%block scripts%}
 <script src="{% static 'js/file_func.js' %}"></script>
+<script>
+    $(document).ready(()=>{
+        $('.anon').val(`{{name}}`)
+    })
+</script>
 {%endblock%}
 

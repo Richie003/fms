@@ -126,6 +126,8 @@ function shareFile(e){
 }
 
 // File search/filter algorithm
+/* The above code is a JavaScript code snippet that handles the keyup event on an input field with the
+id "search-input". */
 $('#search-input').keyup((e)=>{
     const searchData = e.target.value;
     const folder_name = $('#folder_name').text();
@@ -134,8 +136,9 @@ $('#search-input').keyup((e)=>{
     resultContainer.empty();
     $.ajax({
         type:'GET',
-        url:`/searchfiles/`,
+        url:`/search/`,
         data:{
+            search_type:"files",
             dts:searchData,
             folder:folder_name
         },
@@ -148,7 +151,7 @@ $('#search-input').keyup((e)=>{
                             <div class="d-flex justify-content-between align-items-center w-100">
                                 <div class="w-50" id="fileN-box">
                                     <input type="checkbox" name="checked-file" value="${i["pk"]}" id="checked_all" class="d-none selector" checked>
-                                    <a class="filename text-gray-dark fw-bolder" href="/mediafiles/${i["filename"]}">${i["filename"]}</a>
+                                    <span class="filename text-gray-dark font-weight-bolder">${i["filename"]}</span>
                                 </div>
                                 <div class="">
                                 <button class="btn btn-sm btn-light px-2 flex-shrink-0 get_folder" type="button" onclick="removeFile('/delete/file/${i["pk"]}', '/folder/${i["folder"]}')">
@@ -191,10 +194,8 @@ $('#search-input').keyup((e)=>{
     })
 })
 
-console.log(`folder name: ${$('#folder_name').text()}`)
 // jQuery/AJax POST request to create sub_folder
-$(document).on("click", "#add-file", (e)=>{
-    e.preventDefault();
+$("#folder-btn").click((e)=>{
     $.ajax({
         type:"POST",
         url:"/subfolder/",
@@ -211,3 +212,13 @@ $(document).on("click", "#add-file", (e)=>{
         }
     });
 });
+
+// Dropzone functionality
+Dropzone.autoDiscover = false;
+
+const theDropZone = new Dropzone(".custom-dz", {
+    url:"/dropzone_file/",
+    maxFiles:3,
+    maxFilesize:150,
+    acceptedFiles: ".png, .jpg, .jpeg, .mp3, .mp4, .py, .js, .html, .css, .scss, .zip"
+})

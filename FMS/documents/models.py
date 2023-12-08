@@ -31,6 +31,8 @@ class FileTable(models.Model):
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(default=now)
     
+    def __str__(self):
+        return str(self.original_filename)
     class Meta:
         ordering = ['-created']
     
@@ -150,6 +152,21 @@ class Folder(models.Model):
 
     def __str__(self):
         return str('%s%s%s' % (self.user, '-', self.folder))
+    
+    @classmethod
+    def search_folder(cls, user_id=None, folder=None):
+
+        query = Q()
+
+        if user_id is not None:
+            query &= Q(user_id=user_id)
+
+        if folder is not None:
+            query &= Q(folder__icontains=folder)
+
+        # Apply the filter and return the result
+        return cls.objects.filter(query).order_by('-created')
+    
     
     class Meta:
         ordering = ['-created']

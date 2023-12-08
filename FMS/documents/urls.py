@@ -9,6 +9,7 @@ urlpatterns = [
 # call represents a URL pattern that maps to a specific view function.
     path('', views.index, name='home'),
     path('folder/<str:name>/', views.folderItems, name='folder_files'),
+    path('dropzone_file/', views.dropzone_file, name="dropzone_file"),
     path('delete/<int:pk>/', views.remove_folder, name='delete_folder'),
     # Create sub_folder
     path('subfolder/', views.create_subfolder, name='create_subfolder'),
@@ -22,5 +23,5 @@ urlpatterns = [
     path("authorize/<str:access_link>/<str:ID>/", views.grant_access_via_email),
     path("<str:author>/<str:folder>/<str:file>/<str:external_id>/", views.third_party_access, name="third_party"),
     # Search Files URL path
-    path('searchfiles/', views.searchFiles, name='searchfiles')
+    path('search/', views.searchFunc, name='search')
 ]

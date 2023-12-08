@@ -3,7 +3,6 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from datetime import datetime
 
 from accounts.forms import UserAdminCreationForm
 from accounts.models import User
@@ -12,7 +11,7 @@ from .models import FileTable, FileData, Folder, Share, Notification, save_file,
 from .forms import FileDataForm, FolderDataForm
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
-from email_app import sendEmail
+from .utils import sendEmail, datetime_converter
 
 from django.conf import settings
 from django.contrib import messages
@@ -23,39 +22,24 @@ from django.contrib import messages
 @csrf_protect
 def index(request):
     """
-        The `index` function is a view function in a Django web application that handles requests to the
-        homepage, performs various operations such as creating users, adding files and folders, and renders
-        the homepage template with the necessary data.
+        The `index` function retrieves folder and file data for a specific user, handles form submissions
+        for adding files and folders, and renders the data and forms on the index.html template.
         
         :param request: The `request` parameter is an object that represents the HTTP request made by the
         user. It contains information about the request, such as the user making the request, the method
-        used (GET or POST), any data sent with the request, and other metadata
-        :return: a rendered HTML template called "index/index.html" with the context variables passed to it.
+        used (GET or POST), any data sent with the request, and more. In this code, the `request` object
+        :return: a rendered HTML template called "index/index.html" with the context variables
+        "folder_data", "file_data", "form", "form2", and "folder_count".
     """
     user = request.user
-    symbols = ["!", "@", "_", "*", "&", "%", "$", "#", "-", "(", ")"]
-    nums = random.randint(100, 300)
-    symbol = random.choice(symbols)
-    randomm = secrets.token_hex()
-    randomm = "%s%s%s%s" % (symbol, randomm[:4], symbol, nums)
     folder_data = Folder.objects.all().filter(user=request.user)
     file_data = FileTable.objects.all().filter(
         user=request.user
     )
     folder_count = folder_data.count()
-    # nums = secrets.token_urlsafe()
-    form1 = UserAdminCreationForm
     form = FileDataForm
     form2 = FolderDataForm
     if request.method == "POST":
-        if "user_create" in request.POST:
-            form1 = UserAdminCreationForm(request.POST or None, request.FILES)
-            if form1.is_valid():
-                username = form1.cleaned_data.get("username")
-                instance = form1.save(commit=False)
-                instance.ip = request.META["REMOTE_ADDR"]
-                instance.save()
-                return redirect("login")
         # the files data
         if "file-add" in request.POST:
             form = FileDataForm(request.POST or None, request.FILES)
@@ -89,8 +73,6 @@ def index(request):
         "file_data": file_data,
         "form": form,
         "form2": form2,
-        "form1": form1,
-        "randomm": randomm,
         "folder_count": folder_count,
     }
     return render(request, "index/index.html", context)
@@ -108,6 +90,13 @@ def get_folders(request):
         return JsonResponse({'folder':'no folder yet'}, safe=False)
     return JsonResponse({'folder': 'No folder yet'})
 
+def dropzone_file(request):
+    if request.method == "POST":
+        folder = request.POST.get('hidden_folder_name')
+        file = request.FILES.get('file')
+        save_file(file,{"user":request.user.id, "folder":folder})
+        return HttpResponse('Done')
+    return JsonResponse({"message":"Error"}, safe=False)
 
 def remove_folder(request, pk):
     folder = Folder.objects.get(pk=pk)
@@ -117,19 +106,18 @@ def remove_folder(request, pk):
 
 
 def create_subfolder(request):
-    if request.method == "POST":
-        REQ = request.POST
-        user = request.user.id
-        parent_folder = REQ["parent_folder"]
-        folder = REQ["folder"]
-        data = {
-            "user":user,
-            "parent_folder":parent_folder,
-            "folder":folder
-        }
-        save_subfolder(
-            data = data
-        )
+    REQ = request.POST
+    user = request.user.id
+    parent_folder = REQ["parent_folder"]
+    folder = REQ["folder"]
+    data = {
+        "user":user,
+        "parent_folder":parent_folder,
+        "folder":folder
+    }
+    save_subfolder(
+        data = data
+    )
     return JsonResponse({"res":"success"}, safe=True)
 
 def remove_file(request, pk):
@@ -150,7 +138,6 @@ def remove_all(request):
 
 
 def folderItems(request, name):
-    print(name)
     try:
         folder_items = FileTable.objects.filter(user_id=request.user.id, associate_folder=name)
         file_count = folder_items.count()
@@ -281,33 +268,42 @@ def third_party_access(request, author, folder, file, external_id):
         return HttpResponse(mssg)
 
 # Search files functionality
-def searchFiles(request):
+def searchFunc(request):
     extracts = []
     if request.method == "GET":
-        data = request.GET["dts"]
-        folder = request.GET["folder"]
-        folder_path = request.path
-        query_file = FileTable.search_files(
-            filename=data, 
-            user_id=request.user.id, 
-            associate_folder=folder
-        )
-        for i in query_file:
-            # The above code is converting a string representation of a date and time in the format
-            # "%Y-%m-%dT%H:%M:%S.%fZ" to a datetime object using the `strptime()` function from the `datetime`
-            # module in Python. It then formats the datetime object into a string representation in the format "%a
-            # %d %b %Y" using the `strftime()` function. The resulting formatted date is stored in the variable
-            # `formatted_date`.
-            dt_object = datetime.strptime(str(i.created), "%Y-%m-%d %H:%M:%S.%f%z")
-            formatted_date = dt_object.strftime("%a %d %b %Y")
-            extracts.append({
-                "pk":i.pk,
-                "filename":i.original_filename,
-                "folder":i.associate_folder,
-                "path":folder_path,
-                "created":formatted_date,
-            })
-            
+        if request.GET['search_type'] == 'files':
+            data = request.GET["dts"]
+            folder = request.GET["folder"]
+            folder_path = request.path
+            query_file = FileTable.search_files(
+                filename=data, 
+                user_id=request.user.id, 
+                associate_folder=folder
+            )
+            for i in query_file:
+                formatted_date = datetime_converter(i.created)
+                extracts.append({
+                    "pk":i.pk,
+                    "filename":i.original_filename,
+                    "folder":i.associate_folder,
+                    "path":folder_path,
+                    "created":formatted_date,
+                })
+        elif request.GET['search_type'] == 'folders':
+            user = request.user.id
+            get_folder = request.GET['dts']
+            query_folder = Folder.search_folder(
+                user_id=user,
+                folder=get_folder
+            )
+            for folder in query_folder:
+                # The above code is converting the creation date of a folder into a formatted date.
+                formatted_date = datetime_converter(folder.created)
+                extracts.append({
+                    "Id":folder.id,
+                    "folder":folder.folder,
+                    "created":formatted_date
+                })
         return JsonResponse({"res":extracts}, safe=False)
 
 

@@ -13,7 +13,7 @@
     <meta name="author" content="{{request.user}}" />
     <meta name="generator" content="Jekyll v4.1.1" />
     <title>File Manager | {%block title%}{{request.user|capfirst}}{%endblock%}</title>
-
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/sidebars/">
     <link
       rel="canonical"
       href="https://getbootstrap.com/docs/4.5/examples/offcanvas/"
@@ -45,9 +45,14 @@
         return cookieValue;
       }
       var csrftoken = getCookie("csrftoken");
+      
     </script>
     <!-- Custom styles for this template -->
     <link href="{%static 'css/offcanvas.css' %}" rel="stylesheet" />
+    {% comment %} Dropzone JS & CSS {% endcomment %}
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+    {% comment %}  {% endcomment %}
     {%block links%} {%endblock%}
   </head>
   {%block styles%}
@@ -69,6 +74,10 @@
         animation: 0.5s show ease-in-out;
       }
 
+      .custom-dz{
+        border:dashed !important;
+        border-radius: 10px !important;
+      }
       @keyframes show{
         from{
           opacity:0.5;
@@ -96,8 +105,8 @@
         <div>
           <a class="navbar-brand mr-auto mr-lg-2" href="/">File Manager</a>
         </div>
-        <div {% if request.user.count_notification > 0 %}class="notify"{%endif%}>
-          <i {% if request.user.count_notification > 0 %}class="bi bi-bell-fill"{%else%}class="bi bi-bell"{%endif%} style="font-size: 120%; color: #fff"></i>
+        <div {% if request.user.count_notification > 0 %}class="notify btn btn-lg"{%endif%}>
+          <i {% if request.user.count_notification > 0 %}class="bi bi-bell-fill"{%else%}class="bi bi-bell"{%endif%} style="font-size: 90%; color: #fff"></i>
         </div>
       </div>
     </nav>
@@ -116,12 +125,20 @@
           class="nav-link"
           onclick="folderFormTrigger(this)"
           style="cursor: pointer"
-          >Add Folder <i class="bi bi-plus-square-fill"></i></a
+          >Add Folder <i class="bi bi-folder-plus"></i></a
         >
+        <a class="nav-link" href="#share" onclick="handleShareClicker(this)">
+          Invite
+          <i class="bi bi-person-plus"></i>
+        </a>
+        <a class="nav-link" href="#">
+          Terminal <i class="bi bi-terminal"></i>
+        </a>
+        
         {%if request.user.is_authenticated%}
-        <a class="nav-link" href="{%url 'log_out' request.user.pk%}"
-          >LogOut <i class="bi-person-fill"></i
-        ></a>
+        <a class="nav-link" href="{%url 'log_out'%}"
+          >LogOut <i class="bi-person-fill"></i>
+        </a>
         {%else%}
         <a class="nav-link" href="#signup" onclick="handleClicked(this)"
           >Create an account?</a
@@ -135,7 +152,8 @@
 
     <main role="main" class="container py-5 mt-auto">
       <div class="row">
-        <div class="col-md-4 order-md-2 mb-4 d-none d-md-block">
+        <div {%if request.path == '/' %}class="col-md-4 order-md-2 mb-4 d-none d-md-block"{%else%}class="col-md-6 order-md-2 mb-4 d-none d-md-block"{%endif%}>
+          {%if request.path == '/' %}
           <h4 class="d-flex justify-content-between align-items-center mb-3">
             <span class="text-white">Your Profile</span>
             <svg
@@ -164,7 +182,7 @@
                   width="20"
                   height="20"
                   viewBox="0 0 512 512"
-                  onclick="userOptions(this)"
+                  onclick="userOptions(this, `0`)"
                 >
                   <path
                     d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
@@ -173,7 +191,7 @@
                 </svg>
                 <div
                   class="primary-bg px-3 py-2 d-none"
-                  id="option-dropdown"
+                  id="option-dropdown-0"
                   style="
                     position: absolute;
                     transform: translate3d(-29px, 36px, 0px);
@@ -274,8 +292,41 @@
               </div>
             </li>
           </ul>
+          {%else%}
+          <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-white">Upload File(s)</span>
+            <i class="bi bi-upload font-weight-bold text-light"></i>
+            
+          </h4>
+          <ul class="list-group mb-3">
+            <li
+              class="list-group-item d-flex justify-content-between lh-condensed"
+            >
+              <div>
+                <h6 class="my-0">Max File size:</h6>
+                <small class="text-muted">256MB</small>
+              </div>
+              <div style="cursor: pointer">
+              </div>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between lh-condensed"
+              style="flex-direction: column"
+            >
+              <div class="h-100 w-100">
+                <form action="{% url 'dropzone_file' %}" method="POST" class="dropzone custom-dz">
+                  {%csrf_token%}
+                  <input type="hidden" name="hidden_folder_name" class="anon">
+                  <div class="fallback">
+                    <input type="file" name="file" />
+                  </div>
+                </form>
+              </div>
+            </li>
+          </ul>
+          {%endif%}
         </div>
-        <div class="col-md-8 order-md-1">
+        <div {%if request.path == '/' %}class="col-md-8 order-md-1"{%else%}class="col-md-6 order-md-1"{%endif%}>
           <div class="py-2 px-3 my-3 text-white bg-dark rounded shadow-sm d-flex justify-content-between align-items-center">
             <span>C:{{request.path}}</span>
             <button class="but btn btn-dark my-2 my-sm-0 generate border-0" type="button" id="generate">
@@ -324,7 +375,7 @@
           </div>
           <div class="container px-4 invincible" id="search-cont" data-boolean="False">
             <form method="GET" action="" id>
-                <input type="text" name="search" class="form-control" id="search-input" placeholder="example.txt">
+                <input type="text" name="search" class="form-control" id="search-input" placeholder="example.txt" autofocus>
             </form>
           </div>
           {%block content%} {%endblock%}
@@ -403,22 +454,22 @@
     <div class="bg-modal4 rounded py-3 px-3 position-fixed" id="folder_creation">
       <div class="modal-content py-2 px-3">
         <div class="close" onclick="folderFormCancel(this)">+</div>
-        <i class="bi-file" style="font-size: 300%; color: #757577"></i>
+        <i class="bi bi-folder-plus" style="font-size: 300%; color: #757577"></i>
         <form
           action=""
           class="py-2 px-3"
           method="POST"
           enctype="multipart/form-data"
-          id="add-file"
+          id="add-folder"
         >
         {%csrf_token%}
+          {%if request.path == "/" %}
           <input type="hidden" name="folder-add" />
-          {%if request.path == "home" %}
           {{form2.folder}}
           {%else%}
           <input type="text" class="form-control" value="" id="sub_folder" placeholder="Folder name:" >
           {%endif%}
-          <button class="form-control btn btn-dark mt-3" type="submit">
+          <button class="form-control btn btn-dark mt-3" id="folder-btn" {%if request.path == "/" %}type="submit"{%else%}type="button"{%endif%}>
             Upload
           </button>
         </form>
@@ -485,108 +536,8 @@
         </div>
       </div>
     </div>
-    <div class="bg-modal3 rounded py-2 px-3 position-fixed" id="signup">
-      <div class="modal-content py-5 px-5 mt-5 h-100">
-        <div class="close" onclick="cancelClicked(this)">+</div>
-        <i class="bi-person-circle" style="font-size: 300%; color: #757577"></i>
-        <form
-          action=""
-          class="py-2 px-3"
-          method="POST"
-          enctype="multipart/form-data"
-        >
-          <input type="hidden" name="user_create" />
-          <div class="form-floating mb-1">
-            <label for="id_full_name">Fullname</label>
-            {{form1.full_name}}
-          </div>
-          <div class="form-floating mb-1">
-            <label for="id_email">Email</label>
-            {{form1.email}}
-          </div>
-          <div class="form-floating mb-1">
-            <label for="id_username">Username</label>
-            {{form1.username}}
-          </div>
-          <div class="form-floating mb-1">
-            <label for="id_phone_number">Tel</label>
-            {{form1.tel}}
-          </div>
-          <div class="form-floating mb-1">
-            <label for="id_password1">Password</label>
-            {{form1.password1}}
-          </div>
-          <div class="form-floating mb-1">
-            <label for="id_password2">Confirm Password</label>
-            {{form1.password2}}
-          </div>
-          {%csrf_token%}
-          <button class="form-control btn btn-dark mt-3 mb-3" type="submit">
-            Submit
-          </button>
-        </form>
-      </div>
-    </div>
     <script src="{%static 'js/jquery.js'%}"></script>
-    <script src="{%static 'js/base.js'%}"></script>
-    <script>
-      function handleClick(element) {
-        document.querySelector(".bg-modal").style = "display:flex!important;";
-      }
-      function cancelClick(element) {
-        document.querySelector(".bg-modal").style = "display:none!important;";
-        // const addFileForm = document.getElementById('add-file')
-      }
-      {% comment %} For the share button {% endcomment %}
-      function handleShareClicker(element) {
-        document.querySelector(".bg-modal2").style = "display:flex!important;";
-      }
-      function cancelShareClicker(element) {
-        document.querySelector(".bg-modal2").style = "display:none!important;";
-      }
-      {% comment %} End {% endcomment %}
-      function handleClicked(element) {
-        document.querySelector(".bg-modal3").style = "display:flex!important;";
-      }
-      function cancelClicked(element) {
-        document.querySelector(".bg-modal3").style = "display:none!important;";
-      }
-
-      function folderFormTrigger(element) {
-        document.querySelector(".bg-modal4").style = "display:flex!important;";
-      }
-
-      function folderFormCancel(element) {
-        document.querySelector(".bg-modal4").style = "display:none!important;";
-      }
-
-      function userOptions(element) {
-        var userOptionvar = document.getElementById("option-dropdown");
-
-        if (userOptionvar.classList.contains("d-none")) {
-          userOptionvar.classList.remove("d-none");
-        } else {
-          userOptionvar.classList.add("d-none");
-        }
-      }
-      // <!--    for the code generator-->
-      var code = document.getElementById("code");
-      var view = document.getElementById("cart");
-      var newFile = document.getElementById("new_file");
-      var generator = document.getElementsByClassName("generate");
-
-      function loadpage(time) {
-        setTimeout("location.reload(true);", time);
-      }
-
-      // <!--    for (var i = 0; i < generator.length; i++){-->
-      // <!--        generator[i].addEventListener('click', () => {-->
-      // <!--            view.innerHTML = i++-->
-      // <!--            code.value = '{{randomm}}';-->
-      // <!--            console.log('{{randomm}}')-->
-      // <!--        })-->
-      // <!--    }-->
-    </script>
+    <script src="{%static 'js/base1.js'%}"></script>
     <script>
       var buTs = document.getElementsByClassName("buttss");
       var newFile = document.getElementsByClassName("app_id");
@@ -620,7 +571,11 @@
                 console.log(`error: ${error}`)
             }
 
-            {% comment %} Displays the upload file button only when on the folder page {% endcomment %}
+            {% comment %}
+            The above code is checking the URL path and adding a class of 'd-none' to the element with the ID
+            'filee-upload-trigger' if the URL path does not start with "/folder/". This class is typically used
+            to hide an element using CSS.
+            {% endcomment %} 
             const url_path = `{{request.path}}`
             upload_file_href = $('#filee-upload-trigger')
             if(url_path.substring(0, 8) != "/folder/"){

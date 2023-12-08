@@ -15,37 +15,71 @@
                     <span class="primary-bg mx-1 rounded fw-bolder" id="cart" style="border:1px solid; width: 30px; text-align:center; color:#fff;">{{folder_count}}</span>
                 </div>
 
-
-                {%for folder_name in folder_data%}
-                <div class="media text-muted pt-3">
-                    <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                        <div class="d-flex justify-content-between align-items-center w-100" id="append-folder">
-                            <a class="filename text-dark font-bold" href="{%url 'folder_files' folder_name.folder %}"><i class="bi-folder text-warning"></i> {{folder_name.folder}}</a>
-                            <div class="">
-                                <button class="btn btn-sm btn-light px-2 flex-shrink-0 get_folder" type="button"
-                                    data-folder='{{folder_name.folder}}' onclick="removeFolder(`{%url 'delete_folder' folder_name.pk %}`, `{{request.path}}`)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="20" width="15" viewBox="0 0 448 512">
-                                        <path d="M268 416h24a12 12 0 0 0 12-12V188a12 12 0 0 0-12-12h-24a12
-                                        12 0 0 0-12 12v216a12 12 0 0 0 12 12zM432
-                                        80h-82.41l-34-56.7A48 48 0 0 0 274.41 0H173.59a48 48 0 0 0-41.16 23.3L98.41 80H16A16 16 0 0 0 0 96v16a16 16 0 0 0 16 16h16v336a48 48 0 0 0 48
-                                        48h288a48 48 0 0 0 48-48V128h16a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16zM171.84 50.91A6 6 0 0 1 177 48h94a6 6 0 0 1 5.15 2.91L293.61 80H154.39zM368 464H80V128h288zm-212-48h24a12 12 0 0 0 12-12V188a12 12 0 0 0-12-12h-24a12 12 0 0 0-12 12v216a12 12 0 0 0 12 12z" fill="#ff0000"/>
-                                    </svg>
-                                </button>
-                                <button class="btn btn-sm btn-light buttss" id="new_file" onclick="handleClick(this)"
-                                        data-val={{folder_name.folder}} type="button">
+                <div class="" id="initial-container">
+                    {%for folder_name in folder_data%}
+                    <div class="media text-muted pt-3">
+                        <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                            <div class="d-flex justify-content-between align-items-center w-100" id="append-folder">
+                                <a class="filename text-dark font-weight-bold" href="{%url 'folder_files' folder_name.folder %}"><i class="bi-folder text-warning"></i> {{folder_name.folder}}</a>
+                                <div class="">
+                                    <button class="btn btn-sm btn-light px-2 flex-shrink-0 get_folder" type="button"
+                                        data-folder='{{folder_name.folder}}' onclick="removeFolder(`{%url 'delete_folder' folder_name.pk %}`, `{{request.path}}`)">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="20" width="15" viewBox="0 0 448 512">
-                                            <path d="M352 240v32c0 6.6-5.4 12-12 12h-88v88c0 6.6-5.4 12-12 12h-32c-6.6 0-12-5.4-12-12v-88h-88c-6.6 0-12-5.4-12-12v-32c0-6.6 5.4-12 12-12h88v-88c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v88h88c6.6 0 12 5.4 12 12zm96-160v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48h352c26.5 0 48 21.5 48 48zm-48 346V86c0-3.3-2.7-6-6-6H54c-3.3 0-6 2.7-6 6v340c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z" fill="#00e7ff"/>
+                                            <path d="M268 416h24a12 12 0 0 0 12-12V188a12 12 0 0 0-12-12h-24a12
+                                            12 0 0 0-12 12v216a12 12 0 0 0 12 12zM432
+                                            80h-82.41l-34-56.7A48 48 0 0 0 274.41 0H173.59a48 48 0 0 0-41.16 23.3L98.41 80H16A16 16 0 0 0 0 96v16a16 16 0 0 0 16 16h16v336a48 48 0 0 0 48
+                                            48h288a48 48 0 0 0 48-48V128h16a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16zM171.84 50.91A6 6 0 0 1 177 48h94a6 6 0 0 1 5.15 2.91L293.61 80H154.39zM368 464H80V128h288zm-212-48h24a12 12 0 0 0 12-12V188a12 12 0 0 0-12-12h-24a12 12 0 0 0-12 12v216a12 12 0 0 0 12 12z" fill="#ff0000"/>
                                         </svg>
-                                </button>
+                                    </button>
+                                    <button class="btn btn-sm btn-light buttss position-relative" id="new_file" onclick="userOptions(this, `{{folder_name.id}}`)"
+                                            data-val={{folder_name.folder}} type="button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="20" width="15" viewBox="0 0 448 512">
+                                                <path d="M352 240v32c0 6.6-5.4 12-12 12h-88v88c0 6.6-5.4 12-12 12h-32c-6.6 0-12-5.4-12-12v-88h-88c-6.6 0-12-5.4-12-12v-32c0-6.6 5.4-12 12-12h88v-88c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v88h88c6.6 0 12 5.4 12 12zm96-160v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48h352c26.5 0 48 21.5 48 48zm-48 346V86c0-3.3-2.7-6-6-6H54c-3.3 0-6 2.7-6 6v340c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z" fill="#00e7ff"/>
+                                            </svg>
+                                            <div class="primary-bg px-3 py-2 d-none" id="option-dropdown-{{folder_name.id}}" style="
+                                                position: absolute;
+                                                transform: translate3d(-29px, 36px, 0px);
+                                                top: 0px;
+                                                right: 0px;
+                                                will-change: transform;
+                                                z-index: 3;
+                                                border-radius: 43px 1px 24px 25px;
+                                            ">
+                                            <div class="dropdown-header text-white" style="cursor: text">
+                                                Options For You:
+                                            </div>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center text-light" href="#">
+                                                <svg width="15px" height="15px" viewBox="0 -1.5 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
+
+                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                                                    
+                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    
+                                                    <g id="SVGRepo_iconCarrier"><g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Color-" transform="translate(-800.000000, -363.000000)" fill="#0F82E2"> <path d="M824,389.033255 L814.1195,397.34573 L800,388.053538 L809.7635,380.17347 L823.999971,389.033238 L838.2362,380.172109 L847.9997,388.05369 L833.8802,397.345881 L823.9997,389.033406 Z M814.1198,363 L800.0003,372.292191 L809.7638,380.17226 L824.0003,371.312475 L814.1198,363 Z M824.02895,390.821692 L814.11995,399.109976 L809.87945,396.318993 L809.87945,399.447132 L824.02895,408 L838.17845,399.447132 L838.17845,396.318993 L833.93795,399.109976 L824.02895,390.821692 Z M848,372.292343 L833.8805,363.000151 L824,371.312626 L838.2365,380.172411 L848,372.292343 Z" id="Dropbox"> </path> </g> </g> </g>
+                                                    
+                                                </svg>
+                                                Upload via Dropbox
+                                            </a>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center text-light" onclick="handleClick(this)">
+                                                <svg width="15px" height="15px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.22179 11.2929C2.26917 9.34027 2.26917 6.17444 4.22179 4.22182C6.17441 2.2692 9.34024 2.2692 11.2929 4.22182L18.3639 11.2929C19.5355 12.4645 19.5355 14.364 18.3639 15.5355C17.1924 16.7071 15.2929 16.7071 14.1213 15.5355L7.05022 8.46446C6.65969 8.07394 6.65969 7.44077 7.05022 7.05025C7.44074 6.65972 8.07391 6.65972 8.46443 7.05025L15.5355 14.1213C15.926 14.5118 16.5592 14.5118 16.9497 14.1213C17.3402 13.7308 17.3402 13.0976 16.9497 12.7071L9.87864 5.63603C8.70707 4.46446 6.80758 4.46446 5.636 5.63603C4.46443 6.80761 4.46443 8.7071 5.636 9.87867L14.1213 18.364C15.2929 19.5355 17.1924 19.5355 18.3639 18.364C18.7515 17.9764 19.0095 17.5118 19.1407 17.0204C19.2832 16.4869 19.8313 16.1698 20.3649 16.3123C20.8984 16.4548 21.2155 17.0029 21.073 17.5365C20.8535 18.3585 20.4209 19.1354 19.7781 19.7782C17.8255 21.7308 14.6597 21.7308 12.7071 19.7782L4.22179 11.2929Z" fill="#fff"/>
+                                                </svg>
+                                                From Device
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            </div>
+                                    </button>
+                                </div>
                             </div>
+                            <span class="d-block">{{folder_name.created|date:'D d M Y'}}</span>
                         </div>
-                        <span class="d-block">{{folder_name.created|date:'D d M Y'}}</span>
                     </div>
+                    {%endfor%}
                 </div>
-                {%endfor%}
-                <!-- {%for dt in data2%}
-                <p class="text-muted"><a href="{{dt.file.url}}" class="text-decoration-none">{{dt.file}}</a></p>
-                {%endfor%} -->
+                {% comment %} Search item(s) container {% endcomment %}
+                <div class="d-none" id="result-container">
+                    
+                </div>
                 {%if folder_data > 3%}
                 <small class="d-block text-right mt-3">
                     <a href="#" style="color:#17a2b8;">All Files <i class="bi bi-layers"></i></a>
@@ -55,41 +89,5 @@
     {%endblock%}
 {%block scripts%}
 <script src="/static/js/jquery.js"></script>
-<script src="/static/js/folder_func.js"></script>
-<script>
-    
-    function getCookie(name){
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== ''){
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++){
-                var cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')){
-                    cookieValue = decodeURIComponent(cookie.substring(
-                        name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    function removeFolder(folderURL, redirectURL) {
-        const csrftoken = getCookie('csrftoken');
-        let xmlhttp = new XMLHttpRequest();
-
-        xmlhttp.onreadystatechange = function() {
-            if (xmlhttp.readyState == XMLHttpRequest.DONE){
-                if (xmlhttp.status == 200){
-                    window.location.replace(redirectURL);
-                }else{
-                    alert('there was an error');
-                }
-            }
-        }
-        xmlhttp.open("DELETE", folderURL, true);
-        xmlhttp.setRequestHeader("X-CSRFToken", csrftoken)
-        xmlhttp.send();
-    }
-</script>
+<script src="/static/js/folder_funct.js"></script>
 {%endblock%}
