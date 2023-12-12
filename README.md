@@ -4,6 +4,8 @@
 
 ### What's Special?
 - A user gets a unique QRcode when they sign up which can be used to refer other users to their profile.
+- A dedicated terminal interface for users to easily navigate through their folders and files.
+- Store and access your files with ease on social platforms: Get your files on WhatsApp without having to visit the web application
 
 ### Usage
 - Fork the repo and run ```git commit -m url``` in your local terminal or shell.
