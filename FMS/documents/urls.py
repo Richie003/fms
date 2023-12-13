@@ -23,5 +23,8 @@ urlpatterns = [
     path("authorize/<str:access_link>/<str:ID>/", views.grant_access_via_email),
     path("<str:author>/<str:folder>/<str:file>/<str:external_id>/", views.third_party_access, name="third_party"),
     # Search Files URL path
-    path('search/', views.searchFunc, name='search')
+    path('search/', views.searchFunc, name='search'),
+    # Terminal/shell url path
+    path('termi-shell/', views.terminal_shell, name="termi_shell"),
+    path('terminal/query/', views.list_directory)
 ]

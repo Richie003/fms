@@ -153,6 +153,16 @@ class Folder(models.Model):
     def __str__(self):
         return str('%s%s%s' % (self.user, '-', self.folder))
     
+    @property
+    def get_associated_files(self):
+        query_file = FileTable.objects.filter(user_id=self.user_id, associate_folder=self.folder)
+        return query_file
+    
+    @property
+    def get_sub_folders(self):
+        query_sub_folders = SubFolder.objects.filter(user_id=self.user_id, parent_folder_id=self.id)
+        return query_sub_folders
+    
     @classmethod
     def search_folder(cls, user_id=None, folder=None):
 
@@ -207,7 +217,7 @@ def save_subfolder(data:dict):
 class Share(models.Model):
     sharer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="sharer", on_delete=models.SET_NULL)
     sharee = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,)
-    file = models.ForeignKey(FileData, null=True, blank=True, on_delete=models.CASCADE)
+    file = models.ForeignKey(FileTable, null=True, blank=True, on_delete=models.CASCADE)
     folder = models.ForeignKey(Folder, null=True, blank=True, on_delete=models.CASCADE)
     access_link = models.CharField(max_length=255, unique=True)
     created = models.DateTimeField(default=now)

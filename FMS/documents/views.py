@@ -81,7 +81,8 @@ def index(request):
 def get_folders(request):
     data = []
     try:
-        folder_data = Folder.objects.all().filter(user=request.user)
+        folder_data = sorted(Folder.objects.all().filter(user=request.user))
+        print(folder_data)
         for i in folder_data:
             item = {"name": i.folder, "created": i.created}
             data = data.append(item)
@@ -94,6 +95,7 @@ def dropzone_file(request):
     if request.method == "POST":
         folder = request.POST.get('hidden_folder_name')
         file = request.FILES.get('file')
+        FileData.objects.create(user_id=request.user.id, file=file)
         save_file(file,{"user":request.user.id, "folder":folder})
         return HttpResponse('Done')
     return JsonResponse({"message":"Error"}, safe=False)
@@ -305,6 +307,30 @@ def searchFunc(request):
                     "created":formatted_date
                 })
         return JsonResponse({"res":extracts}, safe=False)
+
+# 
+def terminal_shell(request):
+    return render(request, "terminal/shell.html",context={})
+
+
+# We define a function in python Django that handles the database query and response to be sent to the frontend
+def list_directory(request):
+    extract = []
+    if request.method=="GET": #This checks if the request made from the client side/frontend is a GET request
+        curr_directory = request.GET['curr_dir'] #This is the data we get from the client side/frontend named curr_dir in the jQuery request
+        query_folder = Folder.objects.get(user_id=request.user.id, folder=curr_directory) #This queries the database to filter out a folder with the users ID & curr_directory name from the frontend
+        for i in query_folder.get_sub_folders:
+            folder = {
+                "folder":f"<D> ----- {datetime_converter(i.created)} ----- {i.folder}"
+            }
+            extract.append(folder)
+        for j in query_folder.get_associated_files:
+            file = {
+                "file":f"<F> ----- {datetime_converter(j.created)} ----- {j.original_filename}"
+            }
+            extract.append(file)
+    return JsonResponse({"response":extract}, safe=False)
+    # Now let's configure the url path for this view and our requests
 
 
 def download(request, file_name, folder):

@@ -25,12 +25,14 @@ def sendEmail(context, extras):
 # DateTime converter function[d DD MM YY]
 def datetime_converter(dt):
     """
-    The function `datetime_converter` takes a datetime object as input and returns a formatted date
-    string in the format "Day DD Month YYYY".
-    
-    :param dt: The parameter `dt` is a datetime object that represents a specific date and time
-    :return: a formatted date string in the format "Day Month Year".
+        The function `datetime_converter` takes a datetime object as input and returns a formatted date
+        string in the format "Day DD Month YYYY".
+        
+        :param dt: The parameter `dt` is a datetime object that represents a specific date and time
+        :return: a formatted date string in the format "Day Month Year".
     """
     dt_object = datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S.%f%z")
     formatted_date = dt_object.strftime("%a %d %b %Y")
     return formatted_date
+
+

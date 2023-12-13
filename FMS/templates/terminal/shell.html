@@ -1,0 +1,206 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terminal</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    body {
+      width: 100% !important;
+      height: 35.2rem;
+      background: #15161deb !important;
+    }
+
+    .card {
+      background: #27282e !important;
+      border: none !important;
+    }
+
+    input[type="text"] {
+      font-weight: 800;
+      border: none !important;
+      background: transparent !important;
+      color: bisque !important;
+      caret-color: white;
+      position: relative;
+    }
+
+    input[type="text"]::before {
+      content: "\00a0";
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      color: bisque !important;
+      background-color: white;
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    input[type="text"]:focus {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      caret-color: white;
+      /* Set caret color to your custom color */
+    }
+    .head-icons {
+      border-bottom: 0.5px dashed white !important;
+      border-radius: 2px;
+    }
+  </style>
+
+  <body>
+    <div
+      class="container px-0 mx-0"
+      style="font-family: monospace; max-width: 100%"
+    >
+      <div class="">
+        <div class="col-12">
+          <div class="card">
+            <div
+              class="head-icons d-flex align-items-center justify-content-between py-1"
+            >
+              <div class="card-header text-light border-0">
+                Terminal <i class="bi bi-terminal"></i>
+              </div>
+              <div class="others">
+                <i class="bi bi-circle-fill text-warning px-1"></i>
+                <i class="bi bi-circle-fill text-success px-1"></i>
+                <i class="bi bi-circle-fill text-danger px-1"></i>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="terminal-output"></div>
+              <div
+                class="input-group mb-3 d-flex align-items-center justify-content-center"
+              >
+                <div class="path fw-bold" style="color: #5bff5bfa !important">
+                  C:/ ~
+                </div>
+                <input
+                  type="text"
+                  class="form-control outline-none"
+                  id="terminal-input"
+                  autofocus
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $(document).ready(() => {
+        const terminalOutput = $(".terminal-output");
+        const terminalInput = $("#terminal-input");
+        const terminalSubmit = $("#terminal-submit");
+
+        terminalInput.keydown(function (event) {
+          if (event.which === 13) {
+            const command = terminalInput.val().trim();
+            terminalInput.val("");
+            handleCommand(command);
+          }
+        });
+
+        terminalSubmit.click(() => {
+          const command = terminalInput.val().trim();
+          terminalInput.val("");
+          handleCommand(command);
+        });
+
+        var command_lines =['help', 'clear', 'ls']
+        var guides = [
+          "help: ---- Displays a list of command lines that can be run on this terminal ----", 
+          "clear: ---- Clears the terminal of previous executions or commands ----",
+          "cd: --- Enables user to change directory ----",
+          "ls: --- Lists out all the files and directory in the current directory ----",
+        ]
+
+        function handleCommand(command) {
+          switch (command) {
+            case command_lines[0]:
+              for(i of guides){
+                printToTerminal(i, "text-success");
+              }
+              break;
+            case command_lines[1]:
+              clearTerminalOutput();
+              break;
+            case command_lines[2]:
+              dbQuery("Softwares")
+              break;
+            default:
+              printToTerminal(
+                "~ Unknown command. Type 'help' for available commands.", "text-danger"
+              );
+          }
+        }
+
+        function dbQuery(current_directory){
+          // Here we create a function that collects the current working directory as a parameter and we would use this later on in the code
+          if(current_directory){//We check if a value or data was entered into the parameter:current_directory
+            console.log(current_directory)
+            $.ajax({
+              // we called the jQuery function that allows us to send HTTP requests: POST, GET, DELETE e.t.C
+              // Then we pass in the request type we want to use which is GET request, we also pass in the url path to send the data too
+              // which is /terminal/query/ and finally we pass the data we want to send to the server side to help with the database query
+              type:"GET",
+              url:"/terminal/query/",
+              data:{
+                curr_dir:current_directory,
+              },
+              success: (res)=>{
+                console.log(res)
+                //This is where we get our response back from the server side/backend if the request was successfull
+                printToTerminal("Mode --------   Created --------- Name", "text-secondary"); // this is our output
+                for(i of res.response){
+                  printToTerminal(i["folder"], "text-success"); // this is our output
+                  printToTerminal(i["file"], "text-success"); // this is our output
+                }
+              },
+              error: ()=>{
+                //This is where we get our response back from the server side/backend if the request was not successfull
+                printToTerminal("An error occurred.", "text-danger") // this is our output
+              }
+
+              // Now let's go to the backend and do some coding too
+            })
+          }
+        }
+
+        function printToTerminal(message, clr) {
+          const line = $("<p>").text(message).addClass(clr);
+          terminalOutput.append(line);
+        }
+
+        function clearTerminalOutput() {
+          terminalOutput.html("");
+        }
+
+        //So let's Go to the code
+
+      });
+    </script>
+  </body>
+</html>
