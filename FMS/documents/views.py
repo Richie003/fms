@@ -128,7 +128,6 @@ def remove_file(request, pk):
 
     return HttpResponse("success", content_type="text/plain")
 
-
 def remove_all(request):
     if request.method == "POST":
         file_ids = request.POST.getlist("files_ids[]")
@@ -137,7 +136,6 @@ def remove_all(request):
             file = FileTable.objects.get(pk=int(i))
             file.delete()
         return JsonResponse({"mssg": "Done!"}, safe=False)
-
 
 def folderItems(request, name):
     try:
@@ -148,7 +146,6 @@ def folderItems(request, name):
         return render(request, "index/files.html", context)
     except Exception as e:
         return e
-
 
 def generate_share_url(request):
     """
@@ -215,7 +212,7 @@ def validate_share_url(request, access_link, uidb64):
             data = {
                 "link": f"http://localhost:8000/authorize/{access_link}/{new_uidb64}/"
             }
-            message = f"""{request.user} is trying to gain access to your file"""
+            message = f"""{request.user} is trying to gain access to your file click here to permit them:\n{data["link"]}"""
             Notification.objects.create(to_user_id=int(query_share_model.sharer_id), message=message)
             sendEmail(request, data["link"])
             return HttpResponse('You do not have access to this file')
@@ -308,10 +305,8 @@ def searchFunc(request):
                 })
         return JsonResponse({"res":extracts}, safe=False)
 
-# 
 def terminal_shell(request):
     return render(request, "terminal/shell.html",context={})
-
 
 # We define a function in python Django that handles the database query and response to be sent to the frontend
 def list_directory(request):
@@ -331,7 +326,6 @@ def list_directory(request):
             extract.append(file)
     return JsonResponse({"response":extract}, safe=False)
     # Now let's configure the url path for this view and our requests
-
 
 def download(request, file_name, folder):
     file = FileTable.objects.get(original_filename=file_name, associate_folder=folder)

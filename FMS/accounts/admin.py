@@ -30,7 +30,7 @@ class UserAdmin(BaseUserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': ('email', 'password1', 'password2', 'username', 'full_name', 'ip', 'tel')}
-         ),
+        ),
     )
     search_fields = ('email', 'username', 'full_name', 'ip', 'tel')
     ordering = ('email', 'username', 'full_name', 'ip', 'tel')

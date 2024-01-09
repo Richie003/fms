@@ -129,7 +129,7 @@
           handleCommand(command);
         });
 
-        var command_lines =['help', 'clear', 'ls']
+        var command_lines =['help', 'clear', 'cls', 'ls']
         var guides = [
           "help: ---- Displays a list of command lines that can be run on this terminal ----", 
           "clear: ---- Clears the terminal of previous executions or commands ----",
@@ -144,10 +144,10 @@
                 printToTerminal(i, "text-success");
               }
               break;
-            case command_lines[1]:
+            case (command_lines[1] && command_lines[2]):
               clearTerminalOutput();
               break;
-            case command_lines[2]:
+            case command_lines[3]:
               dbQuery("Softwares")
               break;
             default:
