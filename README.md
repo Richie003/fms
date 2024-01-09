@@ -35,7 +35,7 @@
   - [ ] Integrate WhatsApp Api with the system to upload files from WhatsApp to the web app/download files from the web app.
   - [ ] Create a dashboard for users to see metrics on how much storage space is left to upload files and other important personal information.
   - [ ] A progress bar showing how far a file(s) has been uploaded.
-=======
+  
 # README #
 
 This README would normally document whatever steps are necessary to get your application up and running.
