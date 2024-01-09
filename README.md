@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # File Management System __(FMS)__
 ***A file management system web application that allows users to create folders and store/upload files*** _(all file types like; images, audios, videos etc)_. Have a view of the project here [Launch](https://fms.pythonanywhere.com)
 
@@ -66,4 +65,3 @@ This README would normally document whatever steps are necessary to get your app
 
 * Repo owner or admin
 * Other community or team contact
->>>>>>> f2e6c77b073609e6f96b42830089f9d1479d32ca
