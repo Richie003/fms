@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # File Management System __(FMS)__
 ***A file management system web application that allows users to create folders and store/upload files*** _(all file types like; images, audios, videos etc)_. Have a view of the project here [Launch](https://fms.pythonanywhere.com)
 
@@ -36,7 +35,7 @@
   - [ ] Integrate WhatsApp Api with the system to upload files from WhatsApp to the web app/download files from the web app.
   - [ ] Create a dashboard for users to see metrics on how much storage space is left to upload files and other important personal information.
   - [ ] A progress bar showing how far a file(s) has been uploaded.
-=======
+  
 # README #
 
 This README would normally document whatever steps are necessary to get your application up and running.
@@ -66,4 +65,3 @@ This README would normally document whatever steps are necessary to get your app
 
 * Repo owner or admin
 * Other community or team contact
->>>>>>> f2e6c77b073609e6f96b42830089f9d1479d32ca
