@@ -17,10 +17,10 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('email', 'admin', 'username', 'full_name', 'ip', 'tel')
-    list_filter = ('admin', 'auser')
+    list_display = ('email', 'admin', 'username', 'full_name', 'ip', 'tel', 'verified')
+    list_filter = ('admin', 'auser', 'verified')
     fieldsets = (
-        (None, {'fields': ('email', 'password', 'username', 'full_name', 'ip', 'tel')}),
+        (None, {'fields': ('email', 'password', 'username', 'full_name', 'ip', 'tel', 'verified')}),
         ('Personal info', {'fields': ()}),
         ('Permissions', {'fields': ('admin', 'auser')}),
     )
@@ -29,7 +29,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'username', 'full_name', 'ip', 'tel')}
+            'fields': ('email', 'password1', 'password2', 'username', 'full_name', 'ip', 'tel', 'verified')}
         ),
     )
     search_fields = ('email', 'username', 'full_name', 'ip', 'tel')
@@ -40,6 +40,5 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(User, UserAdmin)
 # Remove Group Model from admin. We're not using it.
 admin.site.unregister(Group)
-
-
+# 
 admin.site.register(UserBio)

@@ -8,3 +8,11 @@ def test_lambdatest_playground():
 
 # if __name__ == "__main__":
 #     test_lambdatest_playground()
+
+# {
+#   "email":"richiebabari@gmail.com",
+#   "username":"richie",
+#   "tel":"08066600208",
+#   "verified":false,
+#   "password":"sing1song"
+# }

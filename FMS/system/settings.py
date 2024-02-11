@@ -36,11 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'qr_code',#
+    'channels',
     'accounts.apps.AccountsConfig',
     'documents.apps.DocumentsConfig',
     'myapi.apps.MyapiConfig',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken',
+#edits
 ]
 
 
@@ -81,6 +83,7 @@ TEMPLATES = [
 
 AUTH_USER_MODEL = 'accounts.User'
 WSGI_APPLICATION = 'system.wsgi.application'
+ASGI_APPLICATION = 'system.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -165,9 +168,10 @@ STATIC_ROOT = os.path.join(BASE_DIR / 'collected_static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = None
-EMAIL_PORT = None
-EMAIL_HOST_USER = None
-EMAIL_HOST_PASSWORD = None
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'richiedilosi2003@gmail.com'
+EMAIL_HOST_PASSWORD = 'kjvardpcuezbxwjh'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+

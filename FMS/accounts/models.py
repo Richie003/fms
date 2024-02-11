@@ -70,7 +70,6 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
 class User(AbstractBaseUser):
     objects = UserManager()
     email = models.EmailField(
@@ -78,11 +77,11 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    username = models.CharField(default='', verbose_name='username', unique=True, null=False, blank=False,
-                                max_length=30)
+    username = models.CharField(default='', verbose_name='username', unique=True, null=False, blank=False, max_length=30)
     tel = models.CharField(default='', null=True, blank=True, max_length=11)
     full_name = models.CharField(default='', blank=False, null=False, max_length=100)
     ip = models.CharField(default='', max_length=200, blank=True)
+    verified = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
     auser = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)  # a admin user; non super-user
@@ -148,8 +147,6 @@ class User(AbstractBaseUser):
     def count_notification(self):
         query_notification_model = Notification.objects.filter(to_user_id=self.pk, read_receipt=False).count()
         return query_notification_model
-        
-
 
 class UserBio(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)

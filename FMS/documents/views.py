@@ -11,9 +11,10 @@ from .models import FileTable, FileData, Folder, Share, Notification, save_file,
 from .forms import FileDataForm, FolderDataForm
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
-from .utils import sendEmail, datetime_converter
+from .utils import *
 
 from django.conf import settings
+import pandas as pd
 from django.contrib import messages
 
 
@@ -37,6 +38,7 @@ def index(request):
         user=request.user
     )
     folder_count = folder_data.count()
+    folder_data = folder_data.iterator(3)
     form = FileDataForm
     form2 = FolderDataForm
     if request.method == "POST":
@@ -79,9 +81,15 @@ def index(request):
 
 # Returns the folders belonging to logged in user
 def get_folders(request):
+# The above code is retrieving folder data from the database for a specific user and returning it as a
+# JSON response. It first retrieves the folder data from the database using the
+# `Folder.objects.all().filter(user=request.user)` query. Then, it sorts the folder data based on the
+# `created` field. It then iterates over the sorted folder data and creates a dictionary `item` with
+# the folder name and creation date. The `item` dictionary is appended to the `data` list. Finally, it
+# returns a JSON response with the folder data if it exists, or a response indicating that there are
     data = []
     try:
-        folder_data = sorted(Folder.objects.all().filter(user=request.user))
+        folder_data = sorted(Folder.objects.all().filter(user=request.user).iterator())
         print(folder_data)
         for i in folder_data:
             item = {"name": i.folder, "created": i.created}
@@ -339,3 +347,14 @@ def download(request, file_name, folder):
     response = HttpResponse(file_content, content_type='application/octet-stream')
     response['Content-Disposition'] = 'attachment; filename=%s' % file_name
     return response
+
+def send_random_email(request):
+    # emails = ['richfielddilosi@startall.net', 'richfieldbabari@gmail.com', 'imdopeme@gmail.com', 'allgaind@gmail.com', 'blisswardd@gmail.com', 'kagabelprecious@gmail.com']
+    excel_file = 'test.xlsx'
+
+    # Read the Excel file
+    df = pd.read_excel(excel_file)
+    emails = df['Email'].tolist()
+    first_names = df['First Name'].tolist()
+    process_large_list(emails, first_names)
+    return HttpResponse(f'Email sent to {first_names}!')

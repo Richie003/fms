@@ -1,6 +1,8 @@
 from datetime import datetime
 from django.conf import settings
 from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives 
+from django.template.loader import render_to_string
 
 def sendEmail(context, extras):
     try:
@@ -35,4 +37,36 @@ def datetime_converter(dt):
     formatted_date = dt_object.strftime("%a %d %b %Y")
     return formatted_date
 
+def process_large_list(email_data, name_data, chunk_size=4):
+    total_email_items = len(email_data)
+    total_name_items = len(name_data)
+    
+    email_chunks = [email_data[i:i + chunk_size] for i in range(0, total_email_items, chunk_size)]
+    name_chunks = [name_data[j:j + chunk_size] for j in range(0, total_name_items, chunk_size)]
+    
+    for email_chunk, name_chunk in zip(email_chunks, name_chunks):
+        process_chunk(email_chunk, name_chunk)
+
+def process_chunk(chunk_1, chunk_2):
+    success_email_list = []
+    counter = 0
+    for email_addr, name in zip(chunk_1, chunk_2):
+        html_content = render_to_string('email_temp.html', {'name': name})
+        msg = EmailMultiAlternatives(
+            subject='Test Email',
+            body='This is a test',
+            from_email=settings.EMAIL_HOST_USER,
+            to=[email_addr]
+        )
+        msg.attach_alternative(html_content, 'text/html')
+
+        msg.send()
+        counter += 1
+        print(f'---> Email sent to {email_addr}\ncount={counter}')
+        success_email_list.append(email_addr)
+
+    process_item(success_email_list)
+
+def process_item(item):
+    print(f"Email sent successfully to list: {item}")
 
