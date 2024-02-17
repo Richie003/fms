@@ -78,7 +78,19 @@
                 </div>
             </div>
             {%endfor%}
+            {%for subfolder in sub_folders%}
+            <div class="media text-muted pt-3">
+                <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                    <div class="d-flex justify-content-between align-items-center w-100" id="append-folder">
+                        <a class="filename text-dark font-weight-bold" href="/folder/Files/"><i class="bi-folder text-warning"></i> {{subfolder.folder}}</a>
+                        <div class="">
+
+                    </div>
+                    <span class="d-block">{{subfolder.created}}</span>
+                </div>
+            </div>
         </div>
+        {%endfor%}
         {% comment %} Search item(s) container {% endcomment %}
         <div class="d-none" id="result-container">
             

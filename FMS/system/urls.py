@@ -23,10 +23,12 @@ urlpatterns = [
     path('admin/user011/', admin.site.urls),
     path('', include('documents.urls')),
     path('accounts/', include('accounts.urls')),
-    # APIs
+    # APIs for NlightR
     re_path('api/login', views.login),
     re_path('api/sign_up', views.sign_up),
-    re_path('api/test_token', views.test_token)
+    re_path('api/test_token', views.test_token),
+    re_path('api/createfolder', views.createFolder),
+    re_path('api/upload-file', views.uploadFile), #uploadFile
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

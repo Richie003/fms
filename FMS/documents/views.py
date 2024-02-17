@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from accounts.forms import UserAdminCreationForm
 from accounts.models import User
 from django.views.decorators.csrf import csrf_protect
-from .models import FileTable, FileData, Folder, Share, Notification, save_file, save_subfolder
+from .models import *
 from .forms import FileDataForm, FolderDataForm
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
@@ -81,6 +81,17 @@ def index(request):
 
 # Returns the folders belonging to logged in user
 def get_folders(request):
+    """
+    The function retrieves folder data from the database for a specific user and returns it as a JSON
+    response.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the requested URL, request
+    headers, and any data sent with the request. In this case, the `request` object is used to retrieve
+    the user making
+    :return: The code is returning a JSON response with the folder data if it exists, or a response
+    indicating that there are no folders yet.
+    """
 # The above code is retrieving folder data from the database for a specific user and returning it as a
 # JSON response. It first retrieves the folder data from the database using the
 # `Folder.objects.all().filter(user=request.user)` query. Then, it sorts the folder data based on the
@@ -100,6 +111,16 @@ def get_folders(request):
     return JsonResponse({'folder': 'No folder yet'})
 
 def dropzone_file(request):
+    """
+    The function `dropzone_file` handles a POST request to save a file and associate it with a user and
+    folder.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information about the request, such as the method (GET, POST, etc.), headers,
+    and data
+    :return: an HttpResponse with the string 'Done' if the request method is POST. If the request method
+    is not POST, it is returning a JsonResponse with the message 'Error'.
+    """
     if request.method == "POST":
         folder = request.POST.get('hidden_folder_name')
         file = request.FILES.get('file')
@@ -116,6 +137,14 @@ def remove_folder(request, pk):
 
 
 def create_subfolder(request):
+    """
+    The function `create_subfolder` creates a subfolder by saving the provided data in the database.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the request method (GET, POST, etc.), headers, and data sent
+    by the client
+    :return: a JSON response with the key "res" set to "success".
+    """
     REQ = request.POST
     user = request.user.id
     parent_folder = REQ["parent_folder"]
@@ -137,6 +166,14 @@ def remove_file(request, pk):
     return HttpResponse("success", content_type="text/plain")
 
 def remove_all(request):
+    """
+    The function `remove_all` takes a POST request and deletes all files with the given IDs.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the request method (e.g., GET, POST), headers, and data sent
+    by the client
+    :return: a JSON response with the message "Done!"
+    """
     if request.method == "POST":
         file_ids = request.POST.getlist("files_ids[]")
         print(f"IDs:{file_ids}")
@@ -146,10 +183,22 @@ def remove_all(request):
         return JsonResponse({"mssg": "Done!"}, safe=False)
 
 def folderItems(request, name):
+    """
+    The function "folderItems" retrieves the items in a folder for a specific user and returns them
+    along with the count of files in the folder.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the method used (GET, POST,
+    etc.), and any data sent with the request
+    :param name: The "name" parameter is the name of the folder for which you want to retrieve the items
+    :return: a rendered HTML template with the context variables "folder_items", "file_count", and
+    "name".
+    """
     try:
         folder_items = FileTable.objects.filter(user_id=request.user.id, associate_folder=name)
+        sub_folders = SubFolder.objects.filter(user_id=request.user.id, associate_folder=name)
         file_count = folder_items.count()
-        context = {"folder_items": folder_items, "file_count": file_count, "name":name}
+        context = {"folder_items": folder_items, "sub_folders":sub_folders, "file_count": file_count, "name":name}
 
         return render(request, "index/files.html", context)
     except Exception as e:
@@ -276,6 +325,17 @@ def third_party_access(request, author, folder, file, external_id):
 
 # Search files functionality
 def searchFunc(request):
+    """
+    The `searchFunc` function takes a request object and searches for files or folders based on the
+    search type specified in the request, and returns the search results in a JSON response.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the request method (GET, POST, etc.), the request
+    parameters, headers, and user information
+    :return: a JSON response containing the extracted data. The extracted data includes information
+    about files or folders based on the search type specified in the request. The extracted data is
+    stored in the "extracts" list and then returned as a JSON response.
+    """
     extracts = []
     if request.method == "GET":
         if request.GET['search_type'] == 'files':
@@ -316,8 +376,18 @@ def searchFunc(request):
 def terminal_shell(request):
     return render(request, "terminal/shell.html",context={})
 
-# We define a function in python Django that handles the database query and response to be sent to the frontend
 def list_directory(request):
+    """
+    The function `list_directory` takes a GET request and retrieves the sub-folders and associated files
+    for a given current directory, and returns the data in a JSON response.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the request method (GET, POST, etc.), request headers,
+    request body, and other relevant data
+    :return: a JSON response containing the extracted folders and files from the specified current
+    directory. The response is in the form of a dictionary with the key "response" and the value being
+    the extracted data.
+    """
     extract = []
     if request.method=="GET": #This checks if the request made from the client side/frontend is a GET request
         curr_directory = request.GET['curr_dir'] #This is the data we get from the client side/frontend named curr_dir in the jQuery request
@@ -333,9 +403,20 @@ def list_directory(request):
             }
             extract.append(file)
     return JsonResponse({"response":extract}, safe=False)
-    # Now let's configure the url path for this view and our requests
 
 def download(request, file_name, folder):
+    """
+    The function `download` retrieves a file from the filesystem using its identifier and returns it as
+    a response with the original filename for downloading.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the request method, headers, and body
+    :param file_name: The name of the file that you want to download. This should be the original
+    filename of the file that was uploaded
+    :param folder: The "folder" parameter is the name or identifier of the folder where the file is
+    located. It is used to retrieve the file from the correct folder in the file system
+    :return: an HttpResponse object.
+    """
     file = FileTable.objects.get(original_filename=file_name, associate_folder=folder)
     identifier = file.identifier
 
@@ -349,6 +430,16 @@ def download(request, file_name, folder):
     return response
 
 def send_random_email(request):
+    """
+    The function `send_random_email` reads email addresses and first names from an Excel file, processes
+    them using the `process_large_list` function, and sends an email to each recipient.
+    
+    :param request: The `request` parameter is typically an object that represents the HTTP request made
+    by the client. It contains information such as the request method, headers, and body. In this case,
+    it seems that the `request` parameter is not being used in the function, so it can be removed if it
+    :return: an HTTP response with a message indicating that an email has been sent to the first names
+    in the list.
+    """
     # emails = ['richfielddilosi@startall.net', 'richfieldbabari@gmail.com', 'imdopeme@gmail.com', 'allgaind@gmail.com', 'blisswardd@gmail.com', 'kagabelprecious@gmail.com']
     excel_file = 'test.xlsx'
 
