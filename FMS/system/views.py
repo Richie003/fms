@@ -4,6 +4,7 @@ from rest_framework.decorators import (
     permission_classes,
 )
 from rest_framework.response import Response
+from django.http import HttpResponse
 from accounts.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -11,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import *
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from documents.utils import datetime_converter
 
 
 @api_view(["POST"])
@@ -105,3 +107,34 @@ def uploadFile(request):
     except Exception as e:
         print(e)
         return Response("{}".format(str(e)), status=500)
+
+@api_view(["GET"])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getUniqueFiles(request):
+    user = request.user
+    print(request.user)
+    file_data = FileTable.objects.filter(user_id=user.id)
+    data_list = [{
+            'uploaded_by':data.user.username,
+            'Id':data.id,
+            'file_short':"{}...".format(data.original_filename[:20]),
+            'file_long':data.original_filename,
+            'created':datetime_converter(data.created),
+            'updated':datetime_converter(data.updated)
+        } for data in file_data]
+    return Response(data_list, status=200)
+
+
+@api_view(["GET"])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def downloadable(request):
+    file_id = request.data["file_Id"]
+    file = FileTable.objects.get(id=file_id)
+    file_path = os.path.join(settings.MEDIA_ROOT, file.identifier)
+
+    with open(file_path, 'rb') as f:
+        response = HttpResponse(f.read(), content_type='application/csv')
+        response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+        return response

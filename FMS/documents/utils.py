@@ -21,7 +21,7 @@ def sendEmail(context, extras):
         )
         return "sent"
     except Exception as e:
-        return "Not Successfull"
+        return "Not Successful"
 
 
 # DateTime converter function[d DD MM YY]
@@ -33,9 +33,14 @@ def datetime_converter(dt):
         :param dt: The parameter `dt` is a datetime object that represents a specific date and time
         :return: a formatted date string in the format "Day Month Year".
     """
-    dt_object = datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S.%f%z")
-    formatted_date = dt_object.strftime("%a %d %b %Y")
-    return formatted_date
+    try:
+        dt_object = datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S.%f%z")
+        formatted_date = dt_object.strftime("%a %d %b %Y")
+        return formatted_date
+    except:
+        dt_object = datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S%z")
+        formatted_date = dt_object.strftime("%a %d %b %Y")
+        return formatted_date
 
 def process_large_list(email_data, name_data, chunk_size=4):
     total_email_items = len(email_data)

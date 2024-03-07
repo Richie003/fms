@@ -144,6 +144,7 @@ class FileData(models.Model):
     #     self.file.save(fname, File(buffer), save=False)
     #     super().save(*args, **kwargs)
 
+
 class Folder(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     folder = models.CharField(default='', blank=False, max_length=45)
@@ -151,7 +152,7 @@ class Folder(models.Model):
     updated = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str('%s%s%s' % (self.user, '-', self.folder))
+        return str(self.folder)
     
     @property
     def get_associated_files(self):

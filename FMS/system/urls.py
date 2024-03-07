@@ -29,6 +29,8 @@ urlpatterns = [
     re_path('api/test_token', views.test_token),
     re_path('api/createfolder', views.createFolder),
     re_path('api/upload-file', views.uploadFile), #uploadFile
+    re_path('api/get-files', views.getUniqueFiles),
+    re_path('api/execute_download', views.downloadable),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

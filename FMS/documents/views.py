@@ -12,7 +12,6 @@ from .forms import FileDataForm, FolderDataForm
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
 from .utils import *
-
 from django.conf import settings
 import pandas as pd
 from django.contrib import messages
@@ -98,14 +97,11 @@ def get_folders(request):
 # `created` field. It then iterates over the sorted folder data and creates a dictionary `item` with
 # the folder name and creation date. The `item` dictionary is appended to the `data` list. Finally, it
 # returns a JSON response with the folder data if it exists, or a response indicating that there are
-    data = []
     try:
         folder_data = sorted(Folder.objects.all().filter(user=request.user).iterator())
         print(folder_data)
-        for i in folder_data:
-            item = {"name": i.folder, "created": i.created}
-            data = data.append(item)
-            return JsonResponse({"folder": data}, safe=False)
+        data = [{"name": i.folder, "created": i.created} for i in folder_data]
+        return JsonResponse({"folder": data}, safe=False)
     except Exception as e:
         return JsonResponse({'folder':'no folder yet'}, safe=False)
     return JsonResponse({'folder': 'No folder yet'})
@@ -134,7 +130,6 @@ def remove_folder(request, pk):
     folder.delete()
 
     return HttpResponse("success", content_type="text/plain")
-
 
 def create_subfolder(request):
     """
@@ -196,9 +191,10 @@ def folderItems(request, name):
     """
     try:
         folder_items = FileTable.objects.filter(user_id=request.user.id, associate_folder=name)
-        sub_folders = SubFolder.objects.filter(user_id=request.user.id, associate_folder=name)
+        folder_id = Folder.objects.get(user_id=request.user.id, folder=name).id
+        sub_folders = SubFolder.objects.filter(user_id=request.user.id, parent_folder=folder_id)
         file_count = folder_items.count()
-        context = {"folder_items": folder_items, "sub_folders":sub_folders, "file_count": file_count, "name":name}
+        context = {"folder_items": folder_items, "file_count": file_count, "name":name, 'subfolders':sub_folders}
 
         return render(request, "index/files.html", context)
     except Exception as e:
@@ -347,15 +343,14 @@ def searchFunc(request):
                 user_id=request.user.id, 
                 associate_folder=folder
             )
-            for i in query_file:
-                formatted_date = datetime_converter(i.created)
-                extracts.append({
-                    "pk":i.pk,
-                    "filename":i.original_filename,
-                    "folder":i.associate_folder,
-                    "path":folder_path,
-                    "created":formatted_date,
-                })
+            extracts = [{
+                "pk":i.pk,
+                "filename":i.original_filename,
+                "folder":i.associate_folder,
+                "path":folder_path,
+                "created":datetime_converter(i.created),
+            } for i in query_file]
+            
         elif request.GET['search_type'] == 'folders':
             user = request.user.id
             get_folder = request.GET['dts']
@@ -363,14 +358,12 @@ def searchFunc(request):
                 user_id=user,
                 folder=get_folder
             )
-            for folder in query_folder:
-                # The above code is converting the creation date of a folder into a formatted date.
-                formatted_date = datetime_converter(folder.created)
-                extracts.append({
-                    "Id":folder.id,
-                    "folder":folder.folder,
-                    "created":formatted_date
-                })
+            # The above code is converting the creation date of a folder into a formatted date.
+            extracts = [{
+                "Id":folder.id,
+                "folder":folder.folder,
+                "created":datetime_converter(folder.created)
+            } for folder in query_folder]
         return JsonResponse({"res":extracts}, safe=False)
 
 def terminal_shell(request):
