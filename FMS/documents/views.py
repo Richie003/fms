@@ -222,7 +222,7 @@ def generate_share_url(request):
             # Retrieve the existing access link
             existing_share = Share.objects.get(file_id=id, access_link__isnull=False)
             uidb64 = urlsafe_base64_encode(force_bytes(FILE.id))
-            access_url = f"http://localhost:8000/surl/{existing_share.access_link}/{uidb64}"
+            access_url = f"https://fms.pythonanywhere.com/surl/{existing_share.access_link}/{uidb64}"
             return JsonResponse({"res": access_url}, safe=False)
         elif not share_exists:
             # Create a new access link if it doesn't exist
@@ -234,7 +234,7 @@ def generate_share_url(request):
                 access_link=access_link,
             )
             uidb64 = urlsafe_base64_encode(force_bytes(FILE.id))
-            access_url = f"http://localhost:8000/surl/{access_link}/{uidb64}"
+            access_url = f"https://fms.pythonanywhere.com/surl/{access_link}/{uidb64}"
             return JsonResponse({"res": access_url}, safe=False)
 
 @login_required
@@ -263,7 +263,7 @@ def validate_share_url(request, access_link, uidb64):
         else:
             new_uidb64 = urlsafe_base64_encode(force_bytes(request.user.id))
             data = {
-                "link": f"http://localhost:8000/authorize/{access_link}/{new_uidb64}/"
+                "link": f"https://fms.pythonanywhere.com/authorize/{access_link}/{new_uidb64}/"
             }
             message = f"""{request.user} is trying to gain access to your file click here to permit them:\n{data["link"]}"""
             Notification.objects.create(to_user_id=int(query_share_model.sharer_id), message=message)
