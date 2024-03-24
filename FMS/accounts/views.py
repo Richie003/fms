@@ -3,12 +3,16 @@ import secrets
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
+from .forms import RegisterForm
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_protect
 
 from accounts.models import UserBio
 
+def sign_up(request):
+    context = {}
+    return render(request, "accounts/signup.html", context)
 
 @csrf_protect
 def login_page(request):

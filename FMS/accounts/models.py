@@ -89,7 +89,7 @@ class User(AbstractBaseUser):
     # notice the absence of a "Password field", that is built in.
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'full_name', 'tel', 'ip']  # Email & Password are required by default.
+    REQUIRED_FIELDS = ['email', 'full_name', 'ip']  # Email & Password are required by default.
 
     def get_full_name(self):
         # The user is identified by their email address

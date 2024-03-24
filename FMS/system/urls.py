@@ -24,13 +24,14 @@ urlpatterns = [
     path('', include('documents.urls')),
     path('accounts/', include('accounts.urls')),
     # APIs for NlightR
-    re_path('api/login', views.login),
-    re_path('api/sign_up', views.sign_up),
-    re_path('api/test_token', views.test_token),
-    re_path('api/createfolder', views.createFolder),
-    re_path('api/upload-file', views.uploadFile), #uploadFile
-    re_path('api/get-files', views.getUniqueFiles),
-    re_path('api/execute_download', views.downloadable),
+    path('api/login/', views.login),
+    path('api/sign_up/', views.sign_up),
+    path('api/validate_username/', views.validate_username),
+    path('api/test_token/', views.test_token),
+    path('api/createfolder/', views.createFolder),
+    path('api/upload-file/', views.uploadFile), #uploadFile
+    path('api/get-files/', views.getUniqueFiles),
+    path('api/execute_download/', views.downloadable),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
