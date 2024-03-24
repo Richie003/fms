@@ -7,6 +7,7 @@ import secrets
 random = secrets.token_urlsafe()
 
 urlpatterns = [
+    path('signup/', views.sign_up, name='signup'),
     path('login/', views.login_page, name='login'),
     path(f'logout/', views.log_out, name='log_out'),
 ]

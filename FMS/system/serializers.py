@@ -5,7 +5,7 @@ from documents.models import *
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User
-        fields = ['email', 'username', 'tel', 'verified', 'password']
+        fields = ['email', 'username', 'full_name', 'verified', 'password']
 
 
 class FolderSerializer(serializers.ModelSerializer):

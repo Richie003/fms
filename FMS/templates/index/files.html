@@ -7,6 +7,213 @@
     <meta name="description" content="">
     <meta name="author" content="{{request.user}}">
     <meta name="generator" content="Jekyll v4.1.1">
+    <style type="text/css">
+        body{margin-top:20px;
+    background-color: #f1f3f7;
+    }
+    .search-box .form-control {
+    border-radius: 10px;
+    padding-left: 40px
+    }
+    
+    .search-box .search-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    fill: #545965;
+    width: 16px;
+    height: 16px
+    }
+    .card {
+    margin-bottom: 24px;
+    -webkit-box-shadow: 0 2px 3px #e4e8f0;
+    box-shadow: 0 2px 3px #e4e8f0;
+    }
+    .card {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid #eff0f2;
+    border-radius: 1rem;
+    }
+    .me-3 {
+    margin-right: 1rem!important;
+    }
+    
+    .font-size-24 {
+    font-size: 24px!important;
+    }
+    .avatar-title {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background-color: #3b76e1;
+    color: #fff;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-weight: 500;
+    height: 100%;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: 100%;
+    }
+    
+    .bg-soft-info {
+    background-color: rgba(87,201,235,.25)!important;
+    }
+    
+    .bg-soft-primary {
+    background-color: rgba(59,118,225,.25)!important;
+    }
+    
+    .avatar-xs {
+    height: 1rem;
+    width: 1rem
+    }
+    
+    .avatar-sm {
+    height: 2rem;
+    width: 2rem
+    }
+    
+    .avatar {
+    height: 3rem;
+    width: 3rem
+    }
+    
+    .avatar-md {
+    height: 4rem;
+    width: 4rem
+    }
+    
+    .avatar-lg {
+    height: 5rem;
+    width: 5rem
+    }
+    
+    .avatar-xl {
+    height: 6rem;
+    width: 6rem
+    }
+    
+    .avatar-title {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background-color: #3b76e1;
+    color: #fff;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-weight: 500;
+    height: 100%;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: 100%
+    }
+    
+    .avatar-group {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding-left: 8px
+    }
+    
+    .avatar-group .avatar-group-item {
+    margin-left: -8px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    -webkit-transition: all .2s;
+    transition: all .2s
+    }
+    
+    .avatar-group .avatar-group-item:hover {
+    position: relative;
+    -webkit-transform: translateY(-2px);
+    transform: translateY(-2px)
+    }
+    
+    .fw-medium {
+    font-weight: 500;
+    }
+    
+    a {
+    text-decoration: none!important;
+    }
+    </style>
+{%endblock%}
+{%block sub_folders%}
+<div class="row mt-4">
+{%for folder in subfolders%}    
+    <div class="col-xl-4 col-sm-6">
+    <div class="card shadow-none border">
+    <div class="card-body p-3">
+    <div class="">
+    <div class="d-flex justify-content-between align-items-center">
+    <div>
+    <i class="bx bxs-folder h1 mb-0 text-warning"></i>
+    </div>
+    <div class="avatar-group">
+    <div class="avatar-group-item">
+    <a href="javascript: void(0);" class="d-inline-block">
+    <div class="avatar-sm">
+    <span class="avatar-title rounded-circle bg-info text-white font-size-16">
+    Y
+    </span>
+    </div>
+    </a>
+    </div>
+    <div class="avatar-group-item">
+        <a href="javascript: void(0);" class="d-inline-block">
+        <div class="avatar-sm">
+        <span class="avatar-title rounded-circle bg-info text-white font-size-16">
+        O
+        </span>
+        </div>
+        </a>
+        </div>
+        <div class="avatar-group-item">
+            <a href="javascript: void(0);" class="d-inline-block">
+            <div class="avatar-sm">
+            <span class="avatar-title rounded-circle bg-info text-white font-size-16">
+            U
+            </span>
+            </div>
+            </a>
+            </div>
+    </div>
+    </div>
+    <div class="d-flex justify-content-between mt-3">
+    <div class="overflow-hidden me-auto">
+    <h5 class="font-size-15 text-truncate mb-1"><a href="javascript: void(0);" class="text-body">{{folder.folder}}</a></h5>
+    <p class="text-muted text-truncate mb-0">20 Files</p>
+    </div>
+    <div class="align-self-end">
+    <p class="text-muted mb-0 font-size-13"><i class="mdi mdi-clock"></i>{{folder.created|date:"SHORT_DATE_FORMAT"}}</p>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+{%endfor%}
+    </div>
 {%endblock%}
     {%block content%}
     <div class="my-3 p-3 bg-white rounded shadow-sm">
@@ -78,19 +285,6 @@
                 </div>
             </div>
             {%endfor%}
-            {%for subfolder in sub_folders%}
-            <div class="media text-muted pt-3">
-                <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                    <div class="d-flex justify-content-between align-items-center w-100" id="append-folder">
-                        <a class="filename text-dark font-weight-bold" href="/folder/Files/"><i class="bi-folder text-warning"></i> {{subfolder.folder}}</a>
-                        <div class="">
-
-                    </div>
-                    <span class="d-block">{{subfolder.created}}</span>
-                </div>
-            </div>
-        </div>
-        {%endfor%}
         {% comment %} Search item(s) container {% endcomment %}
         <div class="d-none" id="result-container">
             

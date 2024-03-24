@@ -13,6 +13,8 @@
     <meta name="author" content="{{request.user}}" />
     <meta name="generator" content="Jekyll v4.1.1" />
     <title>File Manager | {%block title%}{{request.user|capfirst}}{%endblock%}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css" integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/sidebars/">
     <link
       rel="canonical"
@@ -57,6 +59,20 @@
   </head>
   {%block styles%}
     <style>
+      .dropdown-list-image {
+          position: relative;
+          height: 2.5rem;
+          width: 2.5rem;
+      }
+      .dropdown-list-image img {
+          height: 2.5rem;
+          width: 2.5rem;
+      }
+      .btn-light {
+          color: #2cdd9b;
+          background-color: #e5f7f0;
+          border-color: #d8f7eb;
+      }
       a:hover{
         color:#00e7ff !important;
         text-decoration: none !important;
@@ -106,17 +122,23 @@
           <a class="navbar-brand mr-auto mr-lg-2" href="/">File Manager</a>
         </div>
         <div style="position:relative;">
-          <div {% if request.user.count_notification > 0 %}class="notify btn btn-lg"{%endif%}>
+          <div id="notify-bell" {% if request.user.count_notification > 0 %}class="notify btn btn-lg"{%endif%}>
             <i {% if request.user.count_notification > 0 %}class="bi bi-bell-fill"{%else%}class="bi bi-bell"{%endif%} style="font-size: 90%; color: #fff"></i>
           </div>
-          <div class="bg-light border px-3 py-3 w-100" style="position: absolute;">
+          <div class="bg-light rounded border px-3 py-3 d-none" id="notify-board" style="position: absolute; right: 0rem;">
             {%for data in request.user.get_user_notifications%}
-            <div class="cont d-flex justify-content-center align-items-center">
-              <div class="message">
-                {{data.message}}
+            <div class="p-1 d-flex align-items-center osahan-post-header border-bottom" style="width:30rem;">
+              <div class="dropdown-list-image mr-3">
+                <span class="mdi mdi-information-outline"></span>
               </div>
-              <div class="date">{{data.read}}</div>
-            </div>
+              <div class="mr-3">
+                  <small class="mb-2">{{data.message|urlize}}</small>
+              </div>
+              <span class="ml-auto mb-auto">
+                  <br />
+                  <div class="text-right text-muted pt-1">{{date.read}}</div>
+              </span>
+          </div>
             {%endfor%}
           </div>
         </div>
@@ -163,6 +185,8 @@
     </div>
 
     <main role="main" class="container py-5 mt-auto">
+      {%block sub_folders%}
+      {%endblock sub_folders%}
       <div class="row">
         <div {%if request.path == '/' %}class="col-md-4 order-md-2 mb-4 d-none d-md-block"{%else%}class="col-md-6 order-md-2 mb-4 d-none d-md-block"{%endif%}>
           {%if request.path == '/' %}
@@ -431,7 +455,7 @@
             <li><a class="text-muted" href="#">Team</a></li>
             <li><a class="text-muted" href="#">Locations</a></li>
             <li><a class="text-muted" href="#">Privacy</a></li>
-            <li><a class="text-muted" href="javascript.void()">Terms</a></li>
+            <li><a class="text-muted" href="javascript: void(0);">Terms</a></li>
           </ul>
         </div>
       </div>
@@ -593,6 +617,15 @@
             if(url_path.substring(0, 8) != "/folder/"){
                 upload_file_href.addClass('d-none')
             }
+            // Notification Trigger
+            $('#notify-bell').click(()=>{
+              var notificationBoard = $('#notify-board')
+              if(notificationBoard.hasClass('d-none')){
+                notificationBoard.removeClass('d-none').fadeIn(200)
+              }else{
+                notificationBoard.addClass('d-none')
+              }
+            })
     </script>
     {%block scripts%} {%endblock%}
     <script src="{%static 'js/bootstrap.bundle.min.js'%}"></script>
