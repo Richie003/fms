@@ -121,6 +121,7 @@ function shareFile(e){
         },
         success: function(data) {
         copyToClipboard(data.res);
+        alert(`Share link Copied to clipboard`)
         }
     });
 }
