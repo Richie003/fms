@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import uuid, random, urllib, mimetypes, os, secrets
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
@@ -449,7 +448,7 @@ def send_random_email(request):
     first_names = df['First Name'].tolist()
     process_large_list(emails, first_names)
     return HttpResponse(f'Email sent to {first_names}!')
-=======
+# =======
 import uuid, random, urllib, mimetypes, os, secrets
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
@@ -476,7 +475,7 @@ def index(request):
     """
         The `index` function retrieves folder and file data for a specific user, handles form submissions
         for adding files and folders, and renders the data and forms on the index.html template.
-        
+
         :param request: The `request` parameter is an object that represents the HTTP request made by the
         user. It contains information about the request, such as the user making the request, the method
         used (GET or POST), any data sent with the request, and more. In this code, the `request` object
@@ -503,7 +502,7 @@ def index(request):
                     "folder":request.POST.get("associate_folder")
                 }
                 save_file(
-                    file_doc, 
+                    file_doc,
                     extras
                 )
                 if file_doc is None:
@@ -535,7 +534,7 @@ def get_folders(request):
     """
     The function retrieves folder data from the database for a specific user and returns it as a JSON
     response.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the user making the request, the requested URL, request
     headers, and any data sent with the request. In this case, the `request` object is used to retrieve
@@ -562,7 +561,7 @@ def dropzone_file(request):
     """
     The function `dropzone_file` handles a POST request to save a file and associate it with a user and
     folder.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information about the request, such as the method (GET, POST, etc.), headers,
     and data
@@ -586,7 +585,7 @@ def remove_folder(request, pk):
 def create_subfolder(request):
     """
     The function `create_subfolder` creates a subfolder by saving the provided data in the database.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method (GET, POST, etc.), headers, and data sent
     by the client
@@ -615,7 +614,7 @@ def remove_file(request, pk):
 def remove_all(request):
     """
     The function `remove_all` takes a POST request and deletes all files with the given IDs.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method (e.g., GET, POST), headers, and data sent
     by the client
@@ -633,7 +632,7 @@ def folderItems(request, name):
     """
     The function "folderItems" retrieves the items in a folder for a specific user and returns them
     along with the count of files in the folder.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the user making the request, the method used (GET, POST,
     etc.), and any data sent with the request
@@ -656,7 +655,7 @@ def generate_share_url(request):
     """
         The function generates a share URL for a file, either by retrieving an existing access link or
         creating a new one.
-        
+
         :param request: The `request` parameter is an object that represents the HTTP request made by the
         client. It contains information such as the request method (GET, POST, etc.), headers, and any data
         sent with the request. In this case, the `request` object is used to retrieve the value of the
@@ -695,7 +694,7 @@ def validate_share_url(request, access_link, uidb64):
     The function `validate_share_url` checks if a user has access to a shared file and redirects them to
     the file if they do, otherwise it sends an email and a notification to the file owner and returns an error
     message.
-    
+
     :param request: The request object represents the HTTP request made by the user
     :param access_link: The access_link parameter is a unique identifier for a specific share. It is
     used to retrieve the Share object from the database
@@ -728,7 +727,7 @@ def grant_access_via_email(request, access_link, ID):
     """
     The function grants access to a user via email by adding their ID to the sharee list of a Share
     object.
-    
+
     :param request: The `request` parameter is an HTTP request object that contains information about
     the current request being made by the user
     :param access_link: The access link is a unique identifier that is used to grant access to a
@@ -748,7 +747,7 @@ def third_party_access(request, author, folder, file, external_id):
     The function `third_party_access` checks if the user making the request has access to a file based
     on their user ID and an external ID, and returns the file data if they have access, otherwise it
     returns an error message.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the user making the request, the requested URL, and any data
     sent with the request
@@ -776,7 +775,7 @@ def searchFunc(request):
     """
     The `searchFunc` function takes a request object and searches for files or folders based on the
     search type specified in the request, and returns the search results in a JSON response.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method (GET, POST, etc.), the request
     parameters, headers, and user information
@@ -791,8 +790,8 @@ def searchFunc(request):
             folder = request.GET["folder"]
             folder_path = request.path
             query_file = FileTable.search_files(
-                filename=data, 
-                user_id=request.user.id, 
+                filename=data,
+                user_id=request.user.id,
                 associate_folder=folder
             )
             extracts = [{
@@ -802,7 +801,7 @@ def searchFunc(request):
                 "path":folder_path,
                 "created":datetime_converter(i.created),
             } for i in query_file]
-            
+
         elif request.GET['search_type'] == 'folders':
             user = request.user.id
             get_folder = request.GET['dts']
@@ -825,7 +824,7 @@ def list_directory(request):
     """
     The function `list_directory` takes a GET request and retrieves the sub-folders and associated files
     for a given current directory, and returns the data in a JSON response.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method (GET, POST, etc.), request headers,
     request body, and other relevant data
@@ -853,7 +852,7 @@ def download(request, file_name, folder):
     """
     The function `download` retrieves a file from the filesystem using its identifier and returns it as
     a response with the original filename for downloading.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method, headers, and body
     :param file_name: The name of the file that you want to download. This should be the original
@@ -878,7 +877,7 @@ def send_random_email(request):
     """
     The function `send_random_email` reads email addresses and first names from an Excel file, processes
     them using the `process_large_list` function, and sends an email to each recipient.
-    
+
     :param request: The `request` parameter is typically an object that represents the HTTP request made
     by the client. It contains information such as the request method, headers, and body. In this case,
     it seems that the `request` parameter is not being used in the function, so it can be removed if it
@@ -894,4 +893,3 @@ def send_random_email(request):
     first_names = df['First Name'].tolist()
     process_large_list(emails, first_names)
     return HttpResponse(f'Email sent to {first_names}!')
->>>>>>> f8320b0c5bc158d0efc425a39b834bd30b1c112c
