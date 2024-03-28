@@ -12,6 +12,7 @@ from .forms import FileDataForm, FolderDataForm
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
 from .utils import *
+from .CLI import *
 from django.conf import settings
 import pandas as pd
 from django.contrib import messages
@@ -332,17 +333,19 @@ def searchFunc(request):
     about files or folders based on the search type specified in the request. The extracted data is
     stored in the "extracts" list and then returned as a JSON response.
     """
-    extracts = []
+    extracts = None
     if request.method == "GET":
         if request.GET['search_type'] == 'files':
             data = request.GET["dts"]
             folder = request.GET["folder"]
+            print("{}\n{}".format(data, folder))
             folder_path = request.path
             query_file = FileTable.search_files(
                 filename=data, 
                 user_id=request.user.id, 
                 associate_folder=folder
             )
+            print(query_file)
             extracts = [{
                 "pk":i.pk,
                 "filename":i.original_filename,
@@ -396,6 +399,12 @@ def list_directory(request):
             }
             extract.append(file)
     return JsonResponse({"response":extract}, safe=False)
+
+def enter_dir(request):
+    if request.method == "GET":
+        cmd = request.GET["cmd"]
+        response = enter_directory(cmd)
+        return JsonResponse(response, safe=False)
 
 def download(request, file_name, folder):
     """
