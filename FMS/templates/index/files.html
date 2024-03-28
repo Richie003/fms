@@ -159,7 +159,7 @@
     </style>
 {%endblock%}
 {%block sub_folders%}
-<div class="row mt-4">
+<div class="row mt-4" id="sub-folder-container">
 {%for folder in subfolders%}    
     <div class="col-xl-4 col-sm-6">
     <div class="card shadow-none border">
@@ -285,17 +285,18 @@
                 </div>
             </div>
             {%endfor%}
-        {% comment %} Search item(s) container {% endcomment %}
+            {% comment %} Search item(s) container {% endcomment %}
+            <!-- {%for dt in data2%}
+            <p class="text-muted"><a href="{{dt.file.url}}" class="text-decoration-none">{{dt.file}}</a></p>
+            {%endfor%} -->
+            <small class="d-block text-right mt-3">
+                <a href="#" style="color:#17a2b8;">All Files <i class="bi bi-layers"></i></a>
+            </small>
+    
+        </div>
         <div class="d-none" id="result-container">
             
         </div>
-        <!-- {%for dt in data2%}
-        <p class="text-muted"><a href="{{dt.file.url}}" class="text-decoration-none">{{dt.file}}</a></p>
-        {%endfor%} -->
-        <small class="d-block text-right mt-3">
-            <a href="#" style="color:#17a2b8;">All Files <i class="bi bi-layers"></i></a>
-        </small>
-    </div>
     {%endblock%}
 {%block scripts%}
 <script src="{% static 'js/file_func.js' %}"></script>

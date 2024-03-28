@@ -27,6 +27,7 @@ urlpatterns = [
     # Terminal/shell url path
     path('termi-shell/', views.terminal_shell, name="termi_shell"),
     path('terminal/query/', views.list_directory),
+    path('enter_dir/', views.enter_dir),
     # Send random email
     path('send_mails/', views.send_random_email)
 ]
