@@ -129,7 +129,7 @@
           handleCommand(command);
         });
 
-        var command_lines =['help', 'clear', 'cls', 'ls']
+        var command_lines =['help', 'cls']
         var guides = [
           "help: ---- Displays a list of command lines that can be run on this terminal ----", 
           "clear: ---- Clears the terminal of previous executions or commands ----",
@@ -144,20 +144,15 @@
                 printToTerminal(i, "text-success");
               }
               break;
-            case (command_lines[1] && command_lines[2]):
+            case (command_lines[1]):
               clearTerminalOutput();
               break;
-            case command_lines[3]:
-              dbQuery("Softwares")
-              break;
             default:
-              printToTerminal(
-                "~ Unknown command. Type 'help' for available commands.", "text-danger"
-              );
+              enterDir(command)
           }
         }
 
-        function dbQuery(current_directory){
+        function dbQuery(cmd){
           // Here we create a function that collects the current working directory as a parameter and we would use this later on in the code
           if(current_directory){//We check if a value or data was entered into the parameter:current_directory
             console.log(current_directory)
@@ -189,6 +184,27 @@
           }
         }
 
+        function enterDir(cmd){
+          var newPath = $('.path')
+          if(cmd){
+            $.ajax({
+              type:"GET",
+              url:"/enter_dir/",
+              data:{
+                "cmd":cmd
+              },
+              success:(response)=>{
+                localStorage.setItem("folder", response);
+                newPath.empty();
+                newPath.html(`C:/${localStorage.getItem("folder")}/ ~`);
+                console.log(response)
+              },
+              error:()=>{
+                console.log("An error occurred.")
+              }
+            })
+          }
+        }
         function printToTerminal(message, clr) {
           const line = $("<p>").text(message).addClass(clr);
           terminalOutput.append(line);

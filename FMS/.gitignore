@@ -7,6 +7,9 @@ migrations/
 # Media files
 mediafiles/
 
+# Collected static
+collected_static
+
 # Script files
 extract.py
 

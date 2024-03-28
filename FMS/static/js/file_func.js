@@ -139,13 +139,15 @@ $('#search-input').keyup((e)=>{
         type:'GET',
         url:`/search/`,
         data:{
-            search_type:"files",
-            dts:searchData,
-            folder:folder_name
+            "search_type":"files",
+            "dts":searchData,
+            "folder":folder_name
         },
         success: (response)=>{
+            console.log(response)
             if(searchData != ""){
-                for(i of response.res){
+                response.res.forEach(function(i){
+                    console.log()
                     const resultData = `
                     <div class="media text-muted pt-3">
                         <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
@@ -183,7 +185,7 @@ $('#search-input').keyup((e)=>{
                 resultContainer.append(resultData);
                 resultContainer.removeClass('d-none');
                 initialContainer.addClass('d-none');
-                }
+                })
             }else{
                 resultContainer.addClass('d-none');
                 initialContainer.removeClass('d-none');
@@ -195,7 +197,24 @@ $('#search-input').keyup((e)=>{
     })
 })
 
+/**
+ * The function getCurrentDate returns the current date in the format MM/DD/YY.
+ * @returns The function `getCurrentDate` returns the current date in the format "MM/DD/YY".
+ */
+function getCurrentDate() {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    var yy = String(today.getFullYear()).substr(-2);
+
+    return mm + '/' + dd + '/' + yy;
+}
+
 // jQuery/AJax POST request to create sub_folder
+/* The above code is a JavaScript snippet that handles a click event on an element with the id
+"folder-btn". When the element is clicked, it sends a POST request to the "/subfolder/" endpoint
+with some data including the CSRF token, the value of an input field with id "sub_folder", and the
+text content of an element with id "folder_name". */
 $("#folder-btn").click((e)=>{
     $.ajax({
         type:"POST",
@@ -205,8 +224,66 @@ $("#folder-btn").click((e)=>{
             "folder":$("#sub_folder").val(),
             "parent_folder":$('#folder_name').text(),
         },
-        success: (res) => {
-            console.log(res)
+        success: (response) => {
+            var getDate = getCurrentDate();
+            if(response.res === 'success'){
+                $(".bg-modal4").css("display", "none !important");
+                $("#sub-folder-container").append(
+                    `
+                    <div class="col-xl-4 col-sm-6">
+                    <div class="card shadow-none border">
+                    <div class="card-body p-3">
+                    <div class="">
+                    <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                    <i class="bx bxs-folder h1 mb-0 text-warning"></i>
+                    </div>
+                    <div class="avatar-group">
+                    <div class="avatar-group-item">
+                    <a href="javascript: void(0);" class="d-inline-block">
+                    <div class="avatar-sm">
+                    <span class="avatar-title rounded-circle bg-info text-white font-size-16">
+                    Y
+                    </span>
+                    </div>
+                    </a>
+                    </div>
+                    <div class="avatar-group-item">
+                        <a href="javascript: void(0);" class="d-inline-block">
+                        <div class="avatar-sm">
+                        <span class="avatar-title rounded-circle bg-info text-white font-size-16">
+                        O
+                        </span>
+                        </div>
+                        </a>
+                        </div>
+                        <div class="avatar-group-item">
+                            <a href="javascript: void(0);" class="d-inline-block">
+                            <div class="avatar-sm">
+                            <span class="avatar-title rounded-circle bg-info text-white font-size-16">
+                            U
+                            </span>
+                            </div>
+                            </a>
+                            </div>
+                    </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                    <div class="overflow-hidden me-auto">
+                    <h5 class="font-size-15 text-truncate mb-1"><a href="javascript: void(0);" class="text-body">${$("#sub_folder").val()}</a></h5>
+                    <p class="text-muted text-truncate mb-0">20 Files</p>
+                    </div>
+                    <div class="align-self-end">
+                    <p class="text-muted mb-0 font-size-13"><i class="mdi mdi-clock"></i>${getDate}</p>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    `
+                )
+            }
         },
         error: () => {
             console.log("An error occurred")
@@ -219,7 +296,7 @@ Dropzone.autoDiscover = false;
 
 const theDropZone = new Dropzone(".custom-dz", {
     url:"/dropzone_file/",
-    maxFiles:3,
-    maxFilesize:150,
-    acceptedFiles: ".png, .jpg, .jpeg, .mp3, .mp4, .py, .js, .html, .css, .scss, .zip"
+    maxFiles:5,
+    maxFilesize:350,
+    acceptedFiles: ".docx, .pdf, .ppt, .pptx, .xlsx, .txt, .png, .jpg, .jpeg, .mp3, .mp4, .py, .js, .html, .css, .scss, .zip"
 })
