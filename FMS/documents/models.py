@@ -4,6 +4,8 @@ from django.core.files import File
 from django.db.models import Q
 import os
 from io import BytesIO
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 import hashlib
 from django.utils.timezone import now
 
@@ -24,6 +26,7 @@ class Notification(models.Model):
 class FileTable(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     original_filename = models.CharField(max_length=255)
+    file_Id = models.IntegerField(blank=True, null=True)
     file_size = models.IntegerField()
     file_path = models.CharField(max_length=255)
     associate_folder = models.CharField(default='', blank=True, max_length=45)
@@ -33,6 +36,15 @@ class FileTable(models.Model):
     
     def __str__(self):
         return str(self.original_filename)
+    
+    @property
+    def approx_filesize(self):
+        definite_size=None
+        if self.file_size//(1024*1024) > 1:
+            definite_size=f"{self.file_size//(1024*1024)}MB"
+        else:
+            definite_size=f"{self.file_size//1024}KB"
+        return definite_size
     class Meta:
         ordering = ['-created']
     
@@ -70,6 +82,12 @@ class FileTable(models.Model):
         return cls.objects.filter(query).order_by('-created')
     
     @property
+    def convertId(self):
+        uuid = urlsafe_base64_encode(force_bytes(self.id))
+        return uuid
+
+
+    @property
     def get_folder(self):
         """
         The function `get_folder` returns the `Folder` object associated with the `associate_folder`
@@ -91,8 +109,9 @@ def save_file(file_object, extras:dict):
         file = FileTable(
             user_id = int(extras["user"]),
             original_filename=file_object.name,
+            file_Id=int(extras["ID"]),
             file_size=file_object.size,
-            file_path=file_object.temporary_file_path(),
+            file_path=file_object.name,
             associate_folder = extras["folder"],
             identifier=identifier
         )
@@ -100,8 +119,9 @@ def save_file(file_object, extras:dict):
         file = FileTable(
             user_id = int(extras["user"]),
             original_filename=file_object.name,
+            file_Id=int(extras["ID"]),
             file_size=file_object.size,
-            file_path="",
+            file_path=file_object.name,
             associate_folder = extras["folder"],
             identifier=identifier
         )
@@ -134,15 +154,20 @@ class FileData(models.Model):
     def __unicode__(self):
         return self.file
     
-    # def save(self, *args, **kwargs):
-    #     """
-    #     The `save` function saves a file with a specific filename format and then calls the parent class's
-    #     `save` method.
-    #     """
-    #     fname = f"{'%s%s%s' % (self.author, '-', self.file)}"
-    #     buffer = BytesIO()
-    #     self.file.save(fname, File(buffer), save=False)
-    #     super().save(*args, **kwargs)
+    @property
+    def approx_filesize(self):
+        definite_size=None
+        filedata_size = FileTable.objects.get(user_id=self.user.id, original_filename=self.file).file_size
+        if filedata_size//(1024*1024) < 1:
+            definite_size=f"{filedata_size//(1024*1024)}MB"
+        else:
+            definite_size=f"{filedata_size//1024}KB"
+        return definite_size
+    
+    @property
+    def convertId(self):
+        uuid = urlsafe_base64_encode(force_bytes(self.id))
+        return uuid
 
 
 class Folder(models.Model):
@@ -153,6 +178,12 @@ class Folder(models.Model):
 
     def __str__(self):
         return str(self.folder)
+
+
+    @property
+    def convertId(self):
+        uuid = urlsafe_base64_encode(force_bytes(self.id))
+        return uuid
     
     @property
     def get_associated_files(self):
@@ -163,6 +194,7 @@ class Folder(models.Model):
     def get_sub_folders(self):
         query_sub_folders = SubFolder.objects.filter(user_id=self.user_id, parent_folder_id=self.id)
         return query_sub_folders
+
     
     @classmethod
     def search_folder(cls, user_id=None, folder=None):
@@ -191,6 +223,15 @@ class SubFolder(models.Model):
 
     def __str__(self):
         return str('%s%s%s' % (self.user, '-', self.folder))
+    
+    @property
+    def convertId(self):
+        uuid = urlsafe_base64_encode(force_bytes(self.id))
+        return uuid
+    
+    @property
+    def file_count(self):
+        pass
     
 def save_subfolder(data:dict):
     try:

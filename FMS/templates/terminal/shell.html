@@ -89,7 +89,6 @@
                 class="input-group mb-3 d-flex align-items-center justify-content-center"
               >
                 <div class="path fw-bold" style="color: #5bff5bfa !important">
-                  C:/ ~
                 </div>
                 <input
                   type="text"
@@ -114,6 +113,12 @@
         const terminalOutput = $(".terminal-output");
         const terminalInput = $("#terminal-input");
         const terminalSubmit = $("#terminal-submit");
+        const pathPlaceholder = $('.path')
+        if(localStorage.getItem('folder') === null){
+          pathPlaceholder.empty().html(`C:/ ~`)
+        }else{
+          pathPlaceholder.empty().html(`C:/${localStorage.getItem("folder")}/ ~`)
+        }
 
         terminalInput.keydown(function (event) {
           if (event.which === 13) {
