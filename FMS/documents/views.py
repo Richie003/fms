@@ -47,20 +47,15 @@ def index(request):
             form = FileDataForm(request.POST or None, request.FILES)
             if form.is_valid():
                 file_doc = form.cleaned_data.get("file")
+                instance = form.save(commit=False)
+                instance.user_id = request.user.id
+                instance.save()
                 extras = {
                     "user":request.user.id,
+                    "ID":instance.id,
                     "folder":request.POST.get("associate_folder")
                 }
-                save_file(
-                    file_doc, 
-                    extras
-                )
-                if file_doc is None:
-                    messages.warning(request, "No file selected")
-                else:
-                    instance = form.save(commit=False)
-                    instance.user_id = request.user.id
-                    instance.save()
+                save_file(file_doc, extras)
                 return redirect("home")
         if "folder-add" in request.POST:
             form2 = FolderDataForm(request.POST or None)
@@ -92,16 +87,11 @@ def get_folders(request):
     :return: The code is returning a JSON response with the folder data if it exists, or a response
     indicating that there are no folders yet.
     """
-# The above code is retrieving folder data from the database for a specific user and returning it as a
-# JSON response. It first retrieves the folder data from the database using the
-# `Folder.objects.all().filter(user=request.user)` query. Then, it sorts the folder data based on the
-# `created` field. It then iterates over the sorted folder data and creates a dictionary `item` with
-# the folder name and creation date. The `item` dictionary is appended to the `data` list. Finally, it
-# returns a JSON response with the folder data if it exists, or a response indicating that there are
     try:
         folder_data = sorted(Folder.objects.all().filter(user=request.user).iterator())
         print(folder_data)
-        data = [{"name": i.folder, "created": i.created} for i in folder_data]
+        data = [{"name": i.folder, "created": i.created, "size":i.approx_filesize} for i in folder_data]
+        print(data)
         return JsonResponse({"folder": data}, safe=False)
     except Exception as e:
         return JsonResponse({'folder':'no folder yet'}, safe=False)
@@ -121,8 +111,8 @@ def dropzone_file(request):
     if request.method == "POST":
         folder = request.POST.get('hidden_folder_name')
         file = request.FILES.get('file')
-        FileData.objects.create(user_id=request.user.id, file=file)
-        save_file(file,{"user":request.user.id, "folder":folder})
+        instance = FileData.objects.create(user_id=request.user.id, file=file)
+        save_file(file,{"user":request.user.id,"ID":instance.id, "folder":folder})
         return HttpResponse('Done')
     return JsonResponse({"message":"Error"}, safe=False)
 
@@ -156,8 +146,11 @@ def create_subfolder(request):
     return JsonResponse({"res":"success"}, safe=True)
 
 def remove_file(request, pk):
-    file = FileTable.objects.get(pk=pk)
+    uuid = force_str(urlsafe_base64_decode(pk))
+    file = FileTable.objects.get(pk=uuid)
+    filedata = FileData.objects.get(id=int(file.file_Id))
     file.delete()
+    filedata.delete()
 
     return HttpResponse("success", content_type="text/plain")
 
@@ -419,17 +412,17 @@ def download(request, file_name, folder):
     located. It is used to retrieve the file from the correct folder in the file system
     :return: an HttpResponse object.
     """
-    file = FileTable.objects.get(original_filename=file_name, associate_folder=folder)
-    identifier = file.identifier
+    file = FileTable.objects.get(user_id=request.user.id, original_filename=file_name, associate_folder=folder)
+    identifier = file.file_path
 
     # Retrieve the file content from the filesystem using the identifier
     with open(os.path.join(settings.MEDIA_ROOT, identifier), 'rb') as f:
         file_content = f.read()
 
-    # Return the file as a response with the original filename
-    response = HttpResponse(file_content, content_type='application/octet-stream')
-    response['Content-Disposition'] = 'attachment; filename=%s' % file_name
-    return response
+        # Return the file as a response with the original filename
+        response = HttpResponse(file_content, content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename=%s' % file_name
+        return response
 
 def send_random_email(request):
     """

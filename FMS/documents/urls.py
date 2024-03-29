@@ -14,7 +14,7 @@ urlpatterns = [
     # Create sub_folder
     path('subfolder/', views.create_subfolder, name='create_subfolder'),
     path('delete/files/', views.remove_all, name='delete_all'),
-    path('delete/file/<int:pk>/', views.remove_file, name='delete_file'),
+    path('delete/file/<str:pk>/', views.remove_file, name='delete_file'),
     path('download/<str:file_name>/<str:folder>', views.download, name='download_file'),
     # Url for getting folders belonging to a user
     path('user_folder/', views.get_folders, name='folders'),

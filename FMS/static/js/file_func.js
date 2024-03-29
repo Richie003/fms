@@ -282,7 +282,8 @@ $("#folder-btn").click((e)=>{
                     </div>
                     </div>
                     `
-                )
+                );
+                $("#sub_folder").val("");
             }
         },
         error: () => {
