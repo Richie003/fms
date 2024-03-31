@@ -29,5 +29,6 @@ urlpatterns = [
     path('terminal/query/', views.list_directory),
     path('enter_dir/', views.enter_dir),
     # Send random email
-    path('send_mails/', views.send_random_email)
+    path('send_mails/', views.send_random_email),
+    path('for-Sharon-Echi/', views.love)
 ]
