@@ -6,6 +6,8 @@ import os
 from io import BytesIO
 import hashlib
 from django.utils.timezone import now
+from django.utils import timezone
+from datetime import timedelta
 
 # The `Notification` class represents a notification message with a recipient, message content, read
 # status, and timestamp.
@@ -230,3 +232,17 @@ class Share(models.Model):
             return str(self.file)
         else:
             return str(self.sharer)
+        
+def default_expiry_date():
+    return timezone.now() + timedelta(days=30)
+        
+class Trash(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  
+    file = models.CharField(max_length=20, blank=False)
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+    expiry_date = models.DateField(default=default_expiry_date)
+    expired = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return str(self.file)
