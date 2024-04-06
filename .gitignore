@@ -48,3 +48,19 @@ Thumbs.db
 *.mov
 *.wmv
 
+# SQLite database
+db.sqlite3
+
+# Migration files
+migrations/
+
+# Media files
+mediafiles/
+
+# Script files
+extract.py
+
+# Virtual environment
+venv/
+
+FMS/ideations.txt

@@ -17,7 +17,7 @@ from documents.models import Notification
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, tel, full_name, ip, password=None):
+    def create_user(self, email, username, full_name, ip, password=None):
         """
         Creates and saves a User with the given email and password.
         """
@@ -27,7 +27,6 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             username=username,
-            tel=tel,
             full_name=full_name,
             ip=ip,
             password=password
@@ -37,14 +36,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_staffuser(self, email, username, tel, full_name, ip, password):
+    def create_staffuser(self, email, username, full_name, ip, password):
         """
         Creates and saves a staff user with the given email and password.
         """
         user = self.create_user(
             email=self.normalize_email(email),
             username=username,
-            tel=tel,
             full_name=full_name,
             ip=ip,
             password=password,
@@ -53,14 +51,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, tel, full_name, ip, password):
+    def create_superuser(self, email, username, full_name, ip, password):
         """
         Creates and saves a superuser with the given email and password.
         """
         user = self.create_user(
             email=self.normalize_email(email),
             username=username,
-            tel=tel,
             full_name=full_name,
             ip=ip,
             password=password,
@@ -89,7 +86,7 @@ class User(AbstractBaseUser):
     # notice the absence of a "Password field", that is built in.
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'full_name', 'tel', 'ip']  # Email & Password are required by default.
+    REQUIRED_FIELDS = ['email', 'full_name', 'ip']  # Email & Password are required by default.
 
     def get_full_name(self):
         # The user is identified by their email address

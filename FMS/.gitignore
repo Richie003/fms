@@ -1,14 +1,22 @@
 # SQLite database
 db.sqlite3
 
+#settings.py
+system/settings.py
+
 # Migration files
 migrations/
 
 # Media files
 mediafiles/
 
+# Collected static
+collected_static
+
 # Script files
 extract.py
 
 # Virtual environment
 venv/
+
+FMS/ideations.txt

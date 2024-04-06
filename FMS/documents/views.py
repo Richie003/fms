@@ -12,6 +12,7 @@ from .forms import FileDataForm, FolderDataForm
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
 from .utils import *
+from .CLI import *
 from django.conf import settings
 import pandas as pd
 from django.contrib import messages
@@ -46,20 +47,15 @@ def index(request):
             form = FileDataForm(request.POST or None, request.FILES)
             if form.is_valid():
                 file_doc = form.cleaned_data.get("file")
+                instance = form.save(commit=False)
+                instance.user_id = request.user.id
+                instance.save()
                 extras = {
                     "user":request.user.id,
+                    "ID":instance.id,
                     "folder":request.POST.get("associate_folder")
                 }
-                save_file(
-                    file_doc, 
-                    extras
-                )
-                if file_doc is None:
-                    messages.warning(request, "No file selected")
-                else:
-                    instance = form.save(commit=False)
-                    instance.user_id = request.user.id
-                    instance.save()
+                save_file(file_doc, extras)
                 return redirect("home")
         if "folder-add" in request.POST:
             form2 = FolderDataForm(request.POST or None)
@@ -91,16 +87,11 @@ def get_folders(request):
     :return: The code is returning a JSON response with the folder data if it exists, or a response
     indicating that there are no folders yet.
     """
-# The above code is retrieving folder data from the database for a specific user and returning it as a
-# JSON response. It first retrieves the folder data from the database using the
-# `Folder.objects.all().filter(user=request.user)` query. Then, it sorts the folder data based on the
-# `created` field. It then iterates over the sorted folder data and creates a dictionary `item` with
-# the folder name and creation date. The `item` dictionary is appended to the `data` list. Finally, it
-# returns a JSON response with the folder data if it exists, or a response indicating that there are
     try:
         folder_data = sorted(Folder.objects.all().filter(user=request.user).iterator())
         print(folder_data)
-        data = [{"name": i.folder, "created": i.created} for i in folder_data]
+        data = [{"name": i.folder, "created": i.created, "size":i.approx_filesize} for i in folder_data]
+        print(data)
         return JsonResponse({"folder": data}, safe=False)
     except Exception as e:
         return JsonResponse({'folder':'no folder yet'}, safe=False)
@@ -120,8 +111,8 @@ def dropzone_file(request):
     if request.method == "POST":
         folder = request.POST.get('hidden_folder_name')
         file = request.FILES.get('file')
-        FileData.objects.create(user_id=request.user.id, file=file)
-        save_file(file,{"user":request.user.id, "folder":folder})
+        instance = FileData.objects.create(user_id=request.user.id, file=file)
+        save_file(file,{"user":request.user.id,"ID":instance.id, "folder":folder})
         return HttpResponse('Done')
     return JsonResponse({"message":"Error"}, safe=False)
 
@@ -155,8 +146,11 @@ def create_subfolder(request):
     return JsonResponse({"res":"success"}, safe=True)
 
 def remove_file(request, pk):
-    file = FileTable.objects.get(pk=pk)
+    uuid = force_str(urlsafe_base64_decode(pk))
+    file = FileTable.objects.get(pk=uuid)
+    filedata = FileData.objects.get(id=int(file.file_Id))
     file.delete()
+    filedata.delete()
 
     return HttpResponse("success", content_type="text/plain")
 
@@ -222,7 +216,7 @@ def generate_share_url(request):
             # Retrieve the existing access link
             existing_share = Share.objects.get(file_id=id, access_link__isnull=False)
             uidb64 = urlsafe_base64_encode(force_bytes(FILE.id))
-            access_url = f"http://localhost:8000/surl/{existing_share.access_link}/{uidb64}"
+            access_url = f"https://fms.pythonanywhere.com/surl/{existing_share.access_link}/{uidb64}"
             return JsonResponse({"res": access_url}, safe=False)
         elif not share_exists:
             # Create a new access link if it doesn't exist
@@ -234,7 +228,7 @@ def generate_share_url(request):
                 access_link=access_link,
             )
             uidb64 = urlsafe_base64_encode(force_bytes(FILE.id))
-            access_url = f"http://localhost:8000/surl/{access_link}/{uidb64}"
+            access_url = f"https://fms.pythonanywhere.com/surl/{access_link}/{uidb64}"
             return JsonResponse({"res": access_url}, safe=False)
 
 @login_required
@@ -263,7 +257,7 @@ def validate_share_url(request, access_link, uidb64):
         else:
             new_uidb64 = urlsafe_base64_encode(force_bytes(request.user.id))
             data = {
-                "link": f"http://localhost:8000/authorize/{access_link}/{new_uidb64}/"
+                "link": f"https://fms.pythonanywhere.com/authorize/{access_link}/{new_uidb64}/"
             }
             message = f"""{request.user} is trying to gain access to your file click here to permit them:\n{data["link"]}"""
             Notification.objects.create(to_user_id=int(query_share_model.sharer_id), message=message)
@@ -332,17 +326,19 @@ def searchFunc(request):
     about files or folders based on the search type specified in the request. The extracted data is
     stored in the "extracts" list and then returned as a JSON response.
     """
-    extracts = []
+    extracts = None
     if request.method == "GET":
         if request.GET['search_type'] == 'files':
             data = request.GET["dts"]
             folder = request.GET["folder"]
+            print("{}\n{}".format(data, folder))
             folder_path = request.path
             query_file = FileTable.search_files(
                 filename=data, 
                 user_id=request.user.id, 
                 associate_folder=folder
             )
+            print(query_file)
             extracts = [{
                 "pk":i.pk,
                 "filename":i.original_filename,
@@ -397,6 +393,12 @@ def list_directory(request):
             extract.append(file)
     return JsonResponse({"response":extract}, safe=False)
 
+def enter_dir(request):
+    if request.method == "GET":
+        cmd = request.GET["cmd"]
+        response = enter_directory(cmd)
+        return JsonResponse(response, safe=False)
+
 def download(request, file_name, folder):
     """
     The function `download` retrieves a file from the filesystem using its identifier and returns it as
@@ -410,17 +412,17 @@ def download(request, file_name, folder):
     located. It is used to retrieve the file from the correct folder in the file system
     :return: an HttpResponse object.
     """
-    file = FileTable.objects.get(original_filename=file_name, associate_folder=folder)
-    identifier = file.identifier
+    file = FileTable.objects.get(user_id=request.user.id, original_filename=file_name, associate_folder=folder)
+    identifier = file.file_path
 
     # Retrieve the file content from the filesystem using the identifier
     with open(os.path.join(settings.MEDIA_ROOT, identifier), 'rb') as f:
         file_content = f.read()
 
-    # Return the file as a response with the original filename
-    response = HttpResponse(file_content, content_type='application/octet-stream')
-    response['Content-Disposition'] = 'attachment; filename=%s' % file_name
-    return response
+        # Return the file as a response with the original filename
+        response = HttpResponse(file_content, content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename=%s' % file_name
+        return response
 
 def send_random_email(request):
     """

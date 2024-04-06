@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+{%load static%}
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content/>
+    <meta name="author" content/>
+    <title>Sign in</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{%static 'css/styles.css' %}" rel="stylesheet"/>
+    <script>
+        var user = '{{request.user}}'
+
+        function getCookie(name){
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== ''){
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++){
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')){
+                        cookieValue = decodeURIComponent(cookie.substring(
+                            name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+
+
+    </script>
+</head>
+<style>
+        .btn-primary {
+        color: #fff;
+        background-color: #777;
+        border-color: #777;
+    }
+    .btn-primary:hover{
+        background-color: #777;
+        border-color: #777;
+    }
+
+</style>
+<body class="d-flex flex-column">
+<main class="flex-shrink-0">
+    <!-- Page content-->
+    <section class="py-5">
+        <div class="container px-5">
+            <!-- Contact form-->
+            <div class="bg-light rounded-3 py-5 px-4 px-md-5 mb-5">
+                <div class="text-center mb-5">
+                    <h1 class="fw-bolder">Sign Up</h1>
+                    <p class="lead fw-normal text-muted mb-0">Before it's too late</p>
+                </div>
+                <div class="row gx-5 justify-content-center">
+                    <div class="col-lg-8 col-xl-6">
+                        <!-- * * * * * * * * * * * * * * *-->
+                        <!-- * * SB Forms Contact Form * *-->
+                        <!-- * * * * * * * * * * * * * * *-->
+                        <!-- This form is pre-integrated with SB Forms.-->
+                        <!-- To make this form functional, sign up at-->
+                        <!-- https://startbootstrap.com/solution/contact-forms-->
+                        <!-- to get an API token!-->
+                        <form id="signupForm" enctype="multipart/form-data" method="POST" >
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="email" type="email" placeholder="Enter your email..." data-sb-validations="required" name="email">
+                                <label for="name">Email</label>
+                            </div>
+                            <!--  -->
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="username" type="text" placeholder="Enter your name..." data-sb-validations="required" name="username">
+                                <label for="name">Username</label>
+                            </div>
+                            <!--  -->
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="fullname" type="text" placeholder="Enter your full name..." data-sb-validations="required" name="fullname">
+                                <label for="name">Full name</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="password" type="password" placeholder="Password..." data-sb-validations="required" name="password">
+                                <label for="password">Password</label>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Sign up</button>
+                            </div>
+                        </form>
+                        <p class="py-3">Already have an account? <a href="{%url 'login' %}">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<!-- Footer-->
+<!-- Bootstrap core JS-->
+<script src="{%static 'js/jquery.js'%}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
+<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+<script>
+// Check if username inputted by user is taken or not
+    $("#username").keyup(()=>{
+        $.ajax({
+            type:"GET",
+            url:"/api/validate_username/",
+            data:{
+                'username':$("#username").val()
+            },
+            success:(response)=>{
+                console.log(response)
+                if(response === "Available"){
+                    $("#username").focus().css({
+                        "color": "#212529",
+                        "background-color": "#fff",
+                        "border-color": "#91fe86",
+                        "outline": "0",
+                        "box-shadow": "0 0 0 0.25rem rgb(127 253 13 / 25%)"
+                    })
+                }else if(response === "Not_available"){
+                    $("#username").focus().css({
+                        "color": "#212529",
+                        "background-color": "#fff",
+                        "border-color": "rgb(254 134 134)",
+                        "outline": "0",
+                        "box-shadow": "rgb(253 13 13 / 25%) 0px 0px 0px 0.25rem"
+                    })
+                }else if(response === ""){
+                    $("#username").focus().css({
+                        "color": "#212529",
+                        "background-color": "#fff",
+                        "border-color": "#86b7fe",
+                        "outline": "0",
+                        "box-shadow": "0 0 0 0.25rem rgba(13, 110, 253, 0.25)"
+                    })
+                }
+            },
+            error:()=>{
+                console.log("An error occurred, please try again.")
+            }
+        })
+    })
+// 
+$(document).on('submit', '#signupForm', (e)=>{
+    e.preventDefault();
+    $.ajax({
+        type:"POST",
+        url:"/api/sign_up/",
+        data:{
+            "email": $('#email').val(),
+            "username": $('#username').val(),
+            "full_name": $('#fullname').val(),
+            "verified": 0,
+            "password": $('#password').val()
+        },
+        success:(response)=>{
+            console.log(response)
+            if(response.token){
+                window.location="{%url 'login' %}"
+            }
+        }
+    })
+})
+</script>
+
+</body>
+</html>
