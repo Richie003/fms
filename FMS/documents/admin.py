@@ -24,10 +24,13 @@ class SubFolderAdmin(admin.ModelAdmin):
     list_filter = ('user', 'parent_folder')
     search_fields = ('user', 'folder')
 
-
+class TrashAdmin(admin.ModelAdmin):
+    list_display = ('user', 'from_folder', 'from_folder', 'deleted_on', 'delete_on')
+    
 admin.site.register(Share, ShareAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(SubFolder, SubFolderAdmin)
+admin.site.register(Trash, TrashAdmin)
 admin.site.register(FileTable)
 admin.site.register(FileData)
 admin.site.register(Folder, FolderAdmin)

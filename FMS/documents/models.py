@@ -8,6 +8,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 import hashlib
 from django.utils.timezone import now
+from django.utils import timezone
+from datetime import timedelta
 
 # The `Notification` class represents a notification message with a recipient, message content, read
 # status, and timestamp.
@@ -144,8 +146,12 @@ def retrieve_file(filename):
     return file_content
 
 class FileData(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     file = models.FileField(default='', blank=True, upload_to=f'./')
+    
+    def delete(self, *args, **kwargs):
+        self.file.delete()
+        super(FileData, self).delete(*args, **kwargs)
 
     def __str__(self):
         # return str('%s%s%s' % (self.file, '-', self.associate_folder))
@@ -168,7 +174,6 @@ class FileData(models.Model):
     def convertId(self):
         uuid = urlsafe_base64_encode(force_bytes(self.id))
         return uuid
-
 
 class Folder(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -271,3 +276,14 @@ class Share(models.Model):
             return str(self.file)
         else:
             return str(self.sharer)
+
+class Trash(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    file = models.ManyToManyField(FileTable)
+    from_folder = models.ForeignKey(Folder, on_delete=models.CASCADE)
+    from_sub_folder = models.ForeignKey(SubFolder, on_delete=models.CASCADE)
+    deleted_on = models.DateTimeField(default=now)
+    delete_on = models.DateField(default=timezone.now() + timedelta(days=30))
+    
+    def __str__(self) -> str:
+        return super().__str__(self.user)

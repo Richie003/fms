@@ -23,13 +23,13 @@ this function, there is a setInterval function that repeatedly makes an AJAX GET
  * @param name - The `name` parameter is the name of the cookie you want to retrieve the value for.
  * @returns the value of the cookie with the specified name.
  */
-function getCookie(name){
+function getCookie(name) {
     var cookieValue = null;
-    if (document.cookie && document.cookie !== ''){
+    if (document.cookie && document.cookie !== '') {
         var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++){
+        for (var i = 0; i < cookies.length; i++) {
             var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')){
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(
                     name.length + 1));
                 break;
@@ -51,11 +51,11 @@ function removeFolder(folderURL, redirectURL) {
     const csrftoken = getCookie('csrftoken');
     let xmlhttp = new XMLHttpRequest();
 
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == XMLHttpRequest.DONE){
-            if (xmlhttp.status == 200){
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+            if (xmlhttp.status == 200) {
                 window.location.replace(redirectURL);
-            }else{
+            } else {
                 alert('there was an error');
             }
         }
@@ -66,21 +66,28 @@ function removeFolder(folderURL, redirectURL) {
 }
 
 
-$('#search-input').keyup((e)=>{
+const renameFolder = function (folder, Id, name) {
+    const foldername = $(`#${folder}`)
+    foldername.empty().append(`<input type="text" class="form-control" value="${name}" autofocus/>`
+    )
+}
+
+
+$('#search-input').keyup((e) => {
     const searchData = e.target.value;
     const initialContainer = $('#initial-container');
     const resultContainer = $('#result-container');
     resultContainer.empty();
     $.ajax({
-        type:'GET',
-        url:`/search/`,
-        data:{
-            search_type:"folders",
-            dts:searchData,
+        type: 'GET',
+        url: `/search/`,
+        data: {
+            search_type: "folders",
+            dts: searchData,
         },
-        success: (response)=>{
-            if(searchData != ""){
-                for(i of response.res){
+        success: (response) => {
+            if (searchData != "") {
+                for (i of response.res) {
                     const resultData = `
                     <div class="media text-muted pt-3">
                         <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
@@ -134,16 +141,16 @@ $('#search-input').keyup((e)=>{
                         </div>
                     </div>
                 `
-                resultContainer.append(resultData);
-                resultContainer.removeClass('d-none');
-                initialContainer.addClass('d-none');
+                    resultContainer.append(resultData);
+                    resultContainer.removeClass('d-none');
+                    initialContainer.addClass('d-none');
                 }
-            }else{
+            } else {
                 resultContainer.addClass('d-none');
                 initialContainer.removeClass('d-none');
             }
         },
-        error: (response)=>{
+        error: (response) => {
             console.log('Error')
         }
     })
