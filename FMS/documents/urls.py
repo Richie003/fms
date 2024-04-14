@@ -11,6 +11,7 @@ urlpatterns = [
     path('folder/<str:name>/', views.folderItems, name='folder_files'),
     path('dropzone_file/', views.dropzone_file, name="dropzone_file"),
     path('delete/<int:pk>/', views.remove_folder, name='delete_folder'),
+    path('rename/', views.renameFolder, name='rename_folder'),
     # Create sub_folder
     path('subfolder/', views.create_subfolder, name='create_subfolder'),
     path('delete/files/', views.remove_all, name='delete_all'),

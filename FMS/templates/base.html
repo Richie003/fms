@@ -419,7 +419,7 @@
           </div>
           <div class="container px-4 invincible" id="search-cont" data-boolean="False">
             <form method="GET" action="" id>
-                <input type="text" name="search" class="form-control" id="search-input" placeholder="example.txt" autofocus>
+                <input type="text" name="search" class="form-control" id="search-input" placeholder="example.txt">
             </form>
           </div>
           {%block content%} {%endblock%}
@@ -651,10 +651,16 @@
                     $('#theme').html(theme);
 
                     // Select all elements with class "text-light" and toggle to "text-dark" or back to "text-light"
-                    document.querySelectorAll('.text-light').forEach((element) => {
-                      element.classList.toggle('text-light', theme === 'Dark');
-                      element.classList.toggle('text-dark', theme === 'Light');
-                    });
+                    // document.querySelectorAll('.text-light').forEach((element) => {
+                    //   element.classList.toggle('text-dark', theme === 'Light');
+                    //   element.classList.toggle('text-light', theme === 'Dark');
+                    // });
+                    console.log(theme)
+                    if(theme === 'Dark'){
+                      $('.text-dark').toggleClass('text-light')
+                    }else{
+                      $('.text-light').toggleClass('text-dark')
+                    }
                 }
                 $('body').removeClass('d-none')
             });

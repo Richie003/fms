@@ -66,11 +66,60 @@ function removeFolder(folderURL, redirectURL) {
 }
 
 
-const renameFolder = function (folder, Id, name) {
-    const foldername = $(`#${folder}`)
-    foldername.empty().append(`<input type="text" class="form-control" value="${name}" autofocus/>`
-    )
+var renameFolder = function (folder, Id, name) {
+    var modalHtml = `
+    <div class="modal fade rounded py-3 px-3 position-fixed" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog py-2 px-3">
+            <div class="modal-content" style="height:72px !important; width:inherit !important;">
+                <div class="modal-header" style="border-bottom:none">
+                    <h5 class="modal-title" id="exampleModalLabel">Rename Folder</h5>
+                    <button type="button" class="btn" data-bs-dismiss="modal" onclick="closeModal(this)" aria-label="Close">
+                    <svg height="18px" width="21px" fill="#000000" viewBox="0 0 200 200" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><title></title><path d="M114,100l49-49a9.9,9.9,0,0,0-14-14L100,86,51,37A9.9,9.9,0,0,0,37,51l49,49L37,149a9.9,9.9,0,0,0,14,14l49-49,49,49a9.9,9.9,0,0,0,14-14Z"></path></g></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input id="rename-folder" type="text" class="form-control py-3" value="${name}" data-fId="${Id}" data-newname="${name}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+    // Append the modal to the body
+    $('body').append(modalHtml);
+    $('#exampleModal').modal('show');
+    $('#rename-folder').val(name);
 }
+
+const closeModal = (element) => {
+    $(element).closest('.modal').modal('hide');
+    $('.modal-backdrop').remove();
+}
+
+$(document).on('keydown', '#rename-folder', function (event) {
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        var Fid = $(this).attr('data-fId');
+        var newName = $(this);
+        console.log(newName)
+        $.ajax({
+            type:"POST",
+            url:"/rename/",
+            data:{
+                'csrfmiddlewaretoken':getCookie('csrftoken'),
+                'name':newName.val(),
+                'Id':Fid
+            },
+            success: (response)=>{
+                newName.val("");
+                console.log(response)
+            },
+            error:(response)=>{
+                console.error(response)
+            }
+        })
+    }
+});
+
+
 
 
 $('#search-input').keyup((e) => {

@@ -276,7 +276,6 @@ class Share(models.Model):
             return str(self.file)
         else:
             return str(self.sharer)
-<<<<<<< HEAD
 
 class Trash(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -288,19 +287,4 @@ class Trash(models.Model):
     
     def __str__(self) -> str:
         return super().__str__(self.user)
-=======
-        
-def default_expiry_date():
-    return timezone.now() + timedelta(days=30)
-        
-class Trash(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  
-    file = models.CharField(max_length=20, blank=False)
-    folder = models.ForeignKey(Folder, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
-    expiry_date = models.DateField(default=default_expiry_date)
-    expired = models.BooleanField(default=False)
-    
-    def __str__(self):
-        return str(self.file)
->>>>>>> 4e8ad02f374f79478d627c3b2c1a2c62c78308e4
+

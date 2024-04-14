@@ -123,6 +123,18 @@ def remove_folder(request, pk):
 
     return HttpResponse("success", content_type="text/plain")
 
+def renameFolder(request):
+    try:
+        Id = int(request.POST['Id'])
+        new_name = request.POST['name']
+        get_folder = Folder.objects.get(user_id=request.user.id, id=Id)
+        get_folder.folder = new_name
+        get_folder.save()
+        return JsonResponse({'success':f'{get_folder.folder} renamed to {new_name}'})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'error':'Server error'}, safe=False)
+
 def create_subfolder(request):
     """
     The function `create_subfolder` creates a subfolder by saving the provided data in the database.

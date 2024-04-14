@@ -7,6 +7,24 @@
     <meta name="description" content="">
     <meta name="author" content="{{request.user}}">
     <meta name="generator" content="Jekyll v4.1.1">
+    <script src="/static/js/jquery.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Iterate over elements with data attributes
+            $('[data-folder]').each(function() {
+                var $element = $(this);
+                var originalData = $element.data('folder');
+                var encryptedData = encryptData(originalData); // Assume this is a function to encrypt data
+                $element.data('folder', encryptedData);
+            });
+    
+            // Function to encrypt data (placeholder function)
+            function encryptData(data) {
+                // Placeholder for actual encryption logic
+                return data.split('').reverse().join(''); // Just reversing the string for demonstration
+            }
+        });
+    </script>    
 {%endblock%}
     {%block content%}
             <div class="my-3 p-3 bg-white rounded shadow-sm">
@@ -22,7 +40,7 @@
                             <div class="d-flex justify-content-between align-items-center w-100" id="append-folder">
                                 <a class="filename text-dark font-weight-bold d-flex align-items-center" href="{%url 'folder_files' folder_name.folder %}" aria-disabled="false"><i class="bx bxs-folder h5 mb-0 text-warning"></i> <span id="folderName-{{folder_name.id}}">{{folder_name.folder}}</span></a>
                                 <div class="">
-                                    <button class="btn btn-sm btn-light px-2 flex-shrink-0" type="button" title="Rename" onclick="renameFolder(`folderName-{{folder_name.id}}`, `{{folder_name.id}}`, `{{folder_name.folder}}`)">
+                                    <button class="btn btn-sm btn-light px-2 flex-shrink-0" type="button" title="Rename" onclick="renameFolder(this, `{{folder_name.id}}`, `{{folder_name.folder}}`)">
                                         <i class="bi bi-pencil-square font-weight-bold text-light" title="Rename" style="font-size: 1rem;"></i>
                                     </button>
                                     <button class="btn btn-sm btn-light px-2 flex-shrink-0 get_folder" type="button" title="Delete"
@@ -91,7 +109,6 @@
             </div>
     {%endblock%}
 {%block scripts%}
-<script src="/static/js/jquery.js"></script>
 <script src="/static/js/folder_funct.js"></script>
 
 {%endblock%}
