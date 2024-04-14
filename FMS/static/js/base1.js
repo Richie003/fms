@@ -33,6 +33,7 @@ $(document).ready(() => {
     }
 
 });
+
 // 
 /**
  * The handleClick function displays a modal by changing the style of the ".bg-modal" element to

@@ -75,6 +75,7 @@ def index(request):
     return render(request, "index/index.html", context)
 
 # Returns the folders belonging to logged in user
+@login_required
 def get_folders(request):
     """
     The function retrieves folder data from the database for a specific user and returns it as a JSON
@@ -122,6 +123,18 @@ def remove_folder(request, pk):
 
     return HttpResponse("success", content_type="text/plain")
 
+def renameFolder(request):
+    try:
+        Id = int(request.POST['Id'])
+        new_name = request.POST['name']
+        get_folder = Folder.objects.get(user_id=request.user.id, id=Id)
+        get_folder.folder = new_name
+        get_folder.save()
+        return JsonResponse({'success':f'{get_folder.folder} renamed to {new_name}'})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'error':'Server error'}, safe=False)
+
 def create_subfolder(request):
     """
     The function `create_subfolder` creates a subfolder by saving the provided data in the database.
@@ -146,6 +159,22 @@ def create_subfolder(request):
     return JsonResponse({"res":"success"}, safe=True)
 
 def remove_file(request, pk):
+<<<<<<< HEAD
+    """
+    The `remove_file` function deletes a file and its associated data from the database.
+    
+    :param request: The `request` parameter in the `remove_file` function is typically an HttpRequest
+    object that represents the incoming request from the client. It contains metadata about the request
+    such as headers, method, and body content. This parameter allows you to access information about the
+    request and process it accordingly in your view or
+    :param pk: The `pk` parameter in the `remove_file` function is typically used to identify the
+    primary key of the file that needs to be removed from the database. It is decoded from a URL-safe
+    base64 string and used to retrieve the corresponding file entry from the `FileTable` model
+    :return: The function `remove_file` is returning an HTTP response with the content "success" and a
+    content type of "text/plain".
+    """
+=======
+>>>>>>> origin/richie
     uuid = force_str(urlsafe_base64_decode(pk))
     file = FileTable.objects.get(pk=uuid)
     filedata = FileData.objects.get(id=int(file.file_Id))
@@ -171,6 +200,7 @@ def remove_all(request):
             file.delete()
         return JsonResponse({"mssg": "Done!"}, safe=False)
 
+@login_required
 def folderItems(request, name):
     """
     The function "folderItems" retrieves the items in a folder for a specific user and returns them
@@ -444,3 +474,7 @@ def send_random_email(request):
     first_names = df['First Name'].tolist()
     process_large_list(emails, first_names)
     return HttpResponse(f'Email sent to {first_names}!')
+
+def love(request):
+    context = {}
+    return render(request, "love.html", context)

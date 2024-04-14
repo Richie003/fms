@@ -75,3 +75,8 @@ def process_chunk(chunk_1, chunk_2):
 def process_item(item):
     print(f"Email sent successfully to list: {item}")
 
+def FileCompressor(files):
+    try:
+        pass
+    except:
+        pass
