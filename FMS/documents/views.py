@@ -159,6 +159,7 @@ def create_subfolder(request):
     return JsonResponse({"res":"success"}, safe=True)
 
 def remove_file(request, pk):
+<<<<<<< HEAD
     """
     The `remove_file` function deletes a file and its associated data from the database.
     
@@ -172,6 +173,8 @@ def remove_file(request, pk):
     :return: The function `remove_file` is returning an HTTP response with the content "success" and a
     content type of "text/plain".
     """
+=======
+>>>>>>> origin/richie
     uuid = force_str(urlsafe_base64_decode(pk))
     file = FileTable.objects.get(pk=uuid)
     filedata = FileData.objects.get(id=int(file.file_Id))

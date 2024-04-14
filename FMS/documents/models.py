@@ -174,6 +174,10 @@ class FileData(models.Model):
     def convertId(self):
         uuid = urlsafe_base64_encode(force_bytes(self.id))
         return uuid
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/richie
 
 class Folder(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
