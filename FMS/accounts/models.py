@@ -67,6 +67,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
 class User(AbstractBaseUser):
     objects = UserManager()
     email = models.EmailField(
@@ -74,9 +75,11 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    username = models.CharField(default='', verbose_name='username', unique=True, null=False, blank=False, max_length=30)
+    username = models.CharField(default='', verbose_name='username',
+                                unique=True, null=False, blank=False, max_length=30)
     tel = models.CharField(default='', null=True, blank=True, max_length=11)
-    full_name = models.CharField(default='', blank=False, null=False, max_length=100)
+    full_name = models.CharField(
+        default='', blank=False, null=False, max_length=100)
     ip = models.CharField(default='', max_length=200, blank=True)
     verified = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
@@ -86,7 +89,8 @@ class User(AbstractBaseUser):
     # notice the absence of a "Password field", that is built in.
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'full_name', 'ip']  # Email & Password are required by default.
+    # Email & Password are required by default.
+    REQUIRED_FIELDS = ['email', 'full_name', 'ip']
 
     def get_full_name(self):
         # The user is identified by their email address
@@ -134,19 +138,23 @@ class User(AbstractBaseUser):
     def is_active(self):
         """Is the user active?"""
         return self.active
-    
+
     @property
     def get_user_notifications(self):
-        query_notification_model = Notification.objects.filter(to_user_id=self.pk, read_receipt=False)
-        return query_notification_model
-    
-    @property
-    def count_notification(self):
-        query_notification_model = Notification.objects.filter(to_user_id=self.pk, read_receipt=False).count()
+        query_notification_model = Notification.objects.filter(
+            to_user_id=self.pk, read_receipt=False)
         return query_notification_model
 
+    @property
+    def count_notification(self):
+        query_notification_model = Notification.objects.filter(
+            to_user_id=self.pk, read_receipt=False).count()
+        return query_notification_model
+
+
 class UserBio(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             null=True, blank=True, on_delete=models.CASCADE)
     code = models.CharField(default='', blank=True, max_length=9)
     qrcode = models.ImageField(upload_to='user_QRC_auth/', blank=True)
     created = models.DateTimeField(auto_now_add=True, editable=True)
