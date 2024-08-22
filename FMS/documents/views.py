@@ -1,4 +1,9 @@
-import uuid, random, urllib, mimetypes, os, secrets
+import uuid
+import random
+import urllib
+import mimetypes
+import os
+import secrets
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -25,7 +30,7 @@ def index(request):
     """
         The `index` function retrieves folder and file data for a specific user, handles form submissions
         for adding files and folders, and renders the data and forms on the index.html template.
-        
+
         :param request: The `request` parameter is an object that represents the HTTP request made by the
         user. It contains information about the request, such as the user making the request, the method
         used (GET or POST), any data sent with the request, and more. In this code, the `request` object
@@ -51,9 +56,9 @@ def index(request):
                 instance.user_id = request.user.id
                 instance.save()
                 extras = {
-                    "user":request.user.id,
-                    "ID":instance.id,
-                    "folder":request.POST.get("associate_folder")
+                    "user": request.user.id,
+                    "ID": instance.id,
+                    "folder": request.POST.get("associate_folder")
                 }
                 save_file(file_doc, extras)
                 return redirect("home")
@@ -75,12 +80,14 @@ def index(request):
     return render(request, "index/index.html", context)
 
 # Returns the folders belonging to logged in user
+
+
 @login_required
 def get_folders(request):
     """
     The function retrieves folder data from the database for a specific user and returns it as a JSON
     response.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the user making the request, the requested URL, request
     headers, and any data sent with the request. In this case, the `request` object is used to retrieve
@@ -89,20 +96,23 @@ def get_folders(request):
     indicating that there are no folders yet.
     """
     try:
-        folder_data = sorted(Folder.objects.all().filter(user=request.user).iterator())
+        folder_data = sorted(Folder.objects.all().filter(
+            user=request.user).iterator())
         print(folder_data)
-        data = [{"name": i.folder, "created": i.created, "size":i.approx_filesize} for i in folder_data]
+        data = [{"name": i.folder, "created": i.created,
+                 "size": i.approx_filesize} for i in folder_data]
         print(data)
         return JsonResponse({"folder": data}, safe=False)
     except Exception as e:
-        return JsonResponse({'folder':'no folder yet'}, safe=False)
+        return JsonResponse({'folder': 'no folder yet'}, safe=False)
     return JsonResponse({'folder': 'No folder yet'})
+
 
 def dropzone_file(request):
     """
     The function `dropzone_file` handles a POST request to save a file and associate it with a user and
     folder.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information about the request, such as the method (GET, POST, etc.), headers,
     and data
@@ -113,15 +123,18 @@ def dropzone_file(request):
         folder = request.POST.get('hidden_folder_name')
         file = request.FILES.get('file')
         instance = FileData.objects.create(user_id=request.user.id, file=file)
-        save_file(file,{"user":request.user.id,"ID":instance.id, "folder":folder})
+        save_file(file, {"user": request.user.id,
+                  "ID": instance.id, "folder": folder})
         return HttpResponse('Done')
-    return JsonResponse({"message":"Error"}, safe=False)
+    return JsonResponse({"message": "Error"}, safe=False)
+
 
 def remove_folder(request, pk):
     folder = Folder.objects.get(pk=pk)
     folder.delete()
 
     return HttpResponse("success", content_type="text/plain")
+
 
 def renameFolder(request):
     try:
@@ -130,15 +143,16 @@ def renameFolder(request):
         get_folder = Folder.objects.get(user_id=request.user.id, id=Id)
         get_folder.folder = new_name
         get_folder.save()
-        return JsonResponse({'success':f'{get_folder.folder} renamed to {new_name}'})
+        return JsonResponse({'success': f'{get_folder.folder} renamed to {new_name}'})
     except Exception as e:
         print(e)
-        return JsonResponse({'error':'Server error'}, safe=False)
+        return JsonResponse({'error': 'Server error'}, safe=False)
+
 
 def create_subfolder(request):
     """
     The function `create_subfolder` creates a subfolder by saving the provided data in the database.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method (GET, POST, etc.), headers, and data sent
     by the client
@@ -149,20 +163,20 @@ def create_subfolder(request):
     parent_folder = REQ["parent_folder"]
     folder = REQ["folder"]
     data = {
-        "user":user,
-        "parent_folder":parent_folder,
-        "folder":folder
+        "user": user,
+        "parent_folder": parent_folder,
+        "folder": folder
     }
     save_subfolder(
-        data = data
+        data=data
     )
-    return JsonResponse({"res":"success"}, safe=True)
+    return JsonResponse({"res": "success"}, safe=True)
+
 
 def remove_file(request, pk):
-<<<<<<< HEAD
     """
     The `remove_file` function deletes a file and its associated data from the database.
-    
+
     :param request: The `request` parameter in the `remove_file` function is typically an HttpRequest
     object that represents the incoming request from the client. It contains metadata about the request
     such as headers, method, and body content. This parameter allows you to access information about the
@@ -173,8 +187,7 @@ def remove_file(request, pk):
     :return: The function `remove_file` is returning an HTTP response with the content "success" and a
     content type of "text/plain".
     """
-=======
->>>>>>> origin/richie
+
     uuid = force_str(urlsafe_base64_decode(pk))
     file = FileTable.objects.get(pk=uuid)
     filedata = FileData.objects.get(id=int(file.file_Id))
@@ -183,10 +196,11 @@ def remove_file(request, pk):
 
     return HttpResponse("success", content_type="text/plain")
 
+
 def remove_all(request):
     """
     The function `remove_all` takes a POST request and deletes all files with the given IDs.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method (e.g., GET, POST), headers, and data sent
     by the client
@@ -194,18 +208,19 @@ def remove_all(request):
     """
     if request.method == "POST":
         file_ids = request.POST.getlist("files_ids[]")
-        print(f"IDs:{file_ids}")
+        print(f"IDs: {file_ids}")
         for i in file_ids:
             file = FileTable.objects.get(pk=int(i))
             file.delete()
         return JsonResponse({"mssg": "Done!"}, safe=False)
+
 
 @login_required
 def folderItems(request, name):
     """
     The function "folderItems" retrieves the items in a folder for a specific user and returns them
     along with the count of files in the folder.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the user making the request, the method used (GET, POST,
     etc.), and any data sent with the request
@@ -214,21 +229,25 @@ def folderItems(request, name):
     "name".
     """
     try:
-        folder_items = FileTable.objects.filter(user_id=request.user.id, associate_folder=name)
+        folder_items = FileTable.objects.filter(
+            user_id=request.user.id, associate_folder=name)
         folder_id = Folder.objects.get(user_id=request.user.id, folder=name).id
-        sub_folders = SubFolder.objects.filter(user_id=request.user.id, parent_folder=folder_id)
+        sub_folders = SubFolder.objects.filter(
+            user_id=request.user.id, parent_folder=folder_id)
         file_count = folder_items.count()
-        context = {"folder_items": folder_items, "file_count": file_count, "name":name, 'subfolders':sub_folders}
+        context = {"folder_items": folder_items, "file_count": file_count,
+                   "name": name, 'subfolders': sub_folders}
 
         return render(request, "index/files.html", context)
     except Exception as e:
         return e
 
+
 def generate_share_url(request):
     """
         The function generates a share URL for a file, either by retrieving an existing access link or
         creating a new one.
-        
+
         :param request: The `request` parameter is an object that represents the HTTP request made by the
         client. It contains information such as the request method (GET, POST, etc.), headers, and any data
         sent with the request. In this case, the `request` object is used to retrieve the value of the
@@ -241,12 +260,15 @@ def generate_share_url(request):
         FILE = FileTable.objects.get(id=int(id))
 
         # Check if the file already has an access link
-        share_exists = Share.objects.filter(file_id=id, access_link__isnull=False).exists()
+        share_exists = Share.objects.filter(
+            file_id=id, access_link__isnull=False).exists()
         if share_exists:
             # Retrieve the existing access link
-            existing_share = Share.objects.get(file_id=id, access_link__isnull=False)
+            existing_share = Share.objects.get(
+                file_id=id, access_link__isnull=False)
             uidb64 = urlsafe_base64_encode(force_bytes(FILE.id))
-            access_url = f"https://fms.pythonanywhere.com/surl/{existing_share.access_link}/{uidb64}"
+            access_url = f"""https: //fms.pythonanywhere.com/surl/{
+                existing_share.access_link}/{uidb64}"""
             return JsonResponse({"res": access_url}, safe=False)
         elif not share_exists:
             # Create a new access link if it doesn't exist
@@ -258,8 +280,10 @@ def generate_share_url(request):
                 access_link=access_link,
             )
             uidb64 = urlsafe_base64_encode(force_bytes(FILE.id))
-            access_url = f"https://fms.pythonanywhere.com/surl/{access_link}/{uidb64}"
+            access_url = f"""https: //fms.pythonanywhere.com/surl/{
+                access_link}/{uidb64}"""
             return JsonResponse({"res": access_url}, safe=False)
+
 
 @login_required
 def validate_share_url(request, access_link, uidb64):
@@ -267,7 +291,7 @@ def validate_share_url(request, access_link, uidb64):
     The function `validate_share_url` checks if a user has access to a shared file and redirects them to
     the file if they do, otherwise it sends an email and a notification to the file owner and returns an error
     message.
-    
+
     :param request: The request object represents the HTTP request made by the user
     :param access_link: The access_link parameter is a unique identifier for a specific share. It is
     used to retrieve the Share object from the database
@@ -287,20 +311,23 @@ def validate_share_url(request, access_link, uidb64):
         else:
             new_uidb64 = urlsafe_base64_encode(force_bytes(request.user.id))
             data = {
-                "link": f"https://fms.pythonanywhere.com/authorize/{access_link}/{new_uidb64}/"
+                "link": f"https: //fms.pythonanywhere.com/authorize/{access_link}/{new_uidb64}/"
             }
-            message = f"""{request.user} is trying to gain access to your file click here to permit them:\n{data["link"]}"""
-            Notification.objects.create(to_user_id=int(query_share_model.sharer_id), message=message)
+            message = f"""{request.user} is trying to gain access to your file click here to permit them: \n{
+                data["link"]}"""
+            Notification.objects.create(to_user_id=int(
+                query_share_model.sharer_id), message=message)
             sendEmail(request, data["link"])
             return HttpResponse('You do not have access to this file')
     except Exception as e:
         return reverse(index)
 
+
 def grant_access_via_email(request, access_link, ID):
     """
     The function grants access to a user via email by adding their ID to the sharee list of a Share
     object.
-    
+
     :param request: The `request` parameter is an HTTP request object that contains information about
     the current request being made by the user
     :param access_link: The access link is a unique identifier that is used to grant access to a
@@ -315,12 +342,13 @@ def grant_access_via_email(request, access_link, ID):
     print(query_share_model.sharee)
     return redirect('/')
 
+
 def third_party_access(request, author, folder, file, external_id):
     """
     The function `third_party_access` checks if the user making the request has access to a file based
     on their user ID and an external ID, and returns the file data if they have access, otherwise it
     returns an error message.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the user making the request, the requested URL, and any data
     sent with the request
@@ -336,19 +364,22 @@ def third_party_access(request, author, folder, file, external_id):
     decode_external_id = force_str(urlsafe_base64_decode(external_id))
     if int(request.user.id) == int(decode_external_id):
         user = User.objects.get(username=author).id
-        query_filedata = FileTable.objects.get(user_id=user, associate_folder=folder, original_filename=file)
-        context = {"items":query_filedata, 'author':author}
+        query_filedata = FileTable.objects.get(
+            user_id=user, associate_folder=folder, original_filename=file)
+        context = {"items": query_filedata, 'author': author}
         return render(request, 'index/third_party.html', context)
     else:
         mssg = f"<h1>Haha..., Joke's on you!</h1>\n<p>Now you would never have access to this file bozoo</p>"
         return HttpResponse(mssg)
 
 # Search files functionality
+
+
 def searchFunc(request):
     """
     The `searchFunc` function takes a request object and searches for files or folders based on the
     search type specified in the request, and returns the search results in a JSON response.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method (GET, POST, etc.), the request
     parameters, headers, and user information
@@ -364,19 +395,19 @@ def searchFunc(request):
             print("{}\n{}".format(data, folder))
             folder_path = request.path
             query_file = FileTable.search_files(
-                filename=data, 
-                user_id=request.user.id, 
+                filename=data,
+                user_id=request.user.id,
                 associate_folder=folder
             )
             print(query_file)
             extracts = [{
-                "pk":i.pk,
-                "filename":i.original_filename,
-                "folder":i.associate_folder,
-                "path":folder_path,
-                "created":datetime_converter(i.created),
+                "pk": i.pk,
+                "filename": i.original_filename,
+                "folder": i.associate_folder,
+                "path": folder_path,
+                "created": datetime_converter(i.created),
             } for i in query_file]
-            
+
         elif request.GET['search_type'] == 'folders':
             user = request.user.id
             get_folder = request.GET['dts']
@@ -386,20 +417,22 @@ def searchFunc(request):
             )
             # The above code is converting the creation date of a folder into a formatted date.
             extracts = [{
-                "Id":folder.id,
-                "folder":folder.folder,
-                "created":datetime_converter(folder.created)
+                "Id": folder.id,
+                "folder": folder.folder,
+                "created": datetime_converter(folder.created)
             } for folder in query_folder]
-        return JsonResponse({"res":extracts}, safe=False)
+        return JsonResponse({"res": extracts}, safe=False)
+
 
 def terminal_shell(request):
-    return render(request, "terminal/shell.html",context={})
+    return render(request, "terminal/shell.html", context={})
+
 
 def list_directory(request):
     """
     The function `list_directory` takes a GET request and retrieves the sub-folders and associated files
     for a given current directory, and returns the data in a JSON response.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method (GET, POST, etc.), request headers,
     request body, and other relevant data
@@ -408,20 +441,24 @@ def list_directory(request):
     the extracted data.
     """
     extract = []
-    if request.method=="GET": #This checks if the request made from the client side/frontend is a GET request
-        curr_directory = request.GET['curr_dir'] #This is the data we get from the client side/frontend named curr_dir in the jQuery request
-        query_folder = Folder.objects.get(user_id=request.user.id, folder=curr_directory) #This queries the database to filter out a folder with the users ID & curr_directory name from the frontend
+    if request.method == "GET":  # This checks if the request made from the client side/frontend is a GET request
+        # This is the data we get from the client side/frontend named curr_dir in the jQuery request
+        curr_directory = request.GET['curr_dir']
+        # This queries the database to filter out a folder with the users ID & curr_directory name from the frontend
+        query_folder = Folder.objects.get(
+            user_id=request.user.id, folder=curr_directory)
         for i in query_folder.get_sub_folders:
             folder = {
-                "folder":f"<D> ----- {datetime_converter(i.created)} ----- {i.folder}"
+                "folder": f"<D> ----- {datetime_converter(i.created)} ----- {i.folder}"
             }
             extract.append(folder)
         for j in query_folder.get_associated_files:
             file = {
-                "file":f"<F> ----- {datetime_converter(j.created)} ----- {j.original_filename}"
+                "file": f"<F> ----- {datetime_converter(j.created)} ----- {j.original_filename}"
             }
             extract.append(file)
-    return JsonResponse({"response":extract}, safe=False)
+    return JsonResponse({"response": extract}, safe=False)
+
 
 def enter_dir(request):
     if request.method == "GET":
@@ -429,11 +466,12 @@ def enter_dir(request):
         response = enter_directory(cmd)
         return JsonResponse(response, safe=False)
 
+
 def download(request, file_name, folder):
     """
     The function `download` retrieves a file from the filesystem using its identifier and returns it as
     a response with the original filename for downloading.
-    
+
     :param request: The `request` parameter is an object that represents the HTTP request made by the
     client. It contains information such as the request method, headers, and body
     :param file_name: The name of the file that you want to download. This should be the original
@@ -442,7 +480,8 @@ def download(request, file_name, folder):
     located. It is used to retrieve the file from the correct folder in the file system
     :return: an HttpResponse object.
     """
-    file = FileTable.objects.get(user_id=request.user.id, original_filename=file_name, associate_folder=folder)
+    file = FileTable.objects.get(
+        user_id=request.user.id, original_filename=file_name, associate_folder=folder)
     identifier = file.file_path
 
     # Retrieve the file content from the filesystem using the identifier
@@ -450,15 +489,17 @@ def download(request, file_name, folder):
         file_content = f.read()
 
         # Return the file as a response with the original filename
-        response = HttpResponse(file_content, content_type='application/octet-stream')
+        response = HttpResponse(
+            file_content, content_type='application/octet-stream')
         response['Content-Disposition'] = 'attachment; filename=%s' % file_name
         return response
+
 
 def send_random_email(request):
     """
     The function `send_random_email` reads email addresses and first names from an Excel file, processes
     them using the `process_large_list` function, and sends an email to each recipient.
-    
+
     :param request: The `request` parameter is typically an object that represents the HTTP request made
     by the client. It contains information such as the request method, headers, and body. In this case,
     it seems that the `request` parameter is not being used in the function, so it can be removed if it
@@ -474,6 +515,7 @@ def send_random_email(request):
     first_names = df['First Name'].tolist()
     process_large_list(emails, first_names)
     return HttpResponse(f'Email sent to {first_names}!')
+
 
 def love(request):
     context = {}
