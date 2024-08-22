@@ -17,6 +17,6 @@ collected_static
 extract.py
 
 # Virtual environment
-venv/
+fms_venv/
 
 FMS/ideations.txt

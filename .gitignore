@@ -61,6 +61,6 @@ mediafiles/
 extract.py
 
 # Virtual environment
-venv/
+fms_venv/
 
 FMS/ideations.txt
